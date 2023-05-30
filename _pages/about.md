@@ -7,7 +7,7 @@ subtitle: PhD student at <a href='https://groups.oist.jp/equip'>Experiemental Qu
 profile:
   align: right
   image: prof_pic.jpg
-  image_circular: true # crops the image to make it circular
+  image_circular: false # crops the image to make it circular
   address: >
     <p>〒 904-0412</p>
     <p>Japan, Okinawa</p>

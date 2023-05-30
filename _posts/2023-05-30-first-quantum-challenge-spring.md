@@ -1,11 +1,10 @@
 ---
 layout: distill
-title: a post with table of contents on a sidebar
+title: Generating GHZ state on IBM device
 date: 2023-05-30
-description: an example of a blog post with table of contents on a sidebar
+description: A look into the quantum challenge spring 2023 final lab
 categories: qiskit quantum-challenge
 giscus_comments: false
-related_posts: false
 toc:
   sidebar: left
 
@@ -13,6 +12,24 @@ authors:
   - name: Soon Teh
     affiliations:
       name: EQuIP, OIST
+
+bibliography: 2018-12-22-distill.bib
+
+# Optionally, you can add a table of contents to your post.
+# NOTES:
+#   - make sure that TOC names match the actual section names
+#     for hyperlinks within the post to work correctly.
+#   - we may want to automate TOC generation in the future using
+#     jekyll-toc plugin (https://github.com/toshimaru/jekyll-toc).
+toc:
+  - name: Adding a Table of Contents
+    subsections:
+    - name: Example of Sub-Heading 1
+    - name: Example of Sub-Heading 2
+  - name: Customizing Your Table of Contents
+    subsections:
+    - name: Example of another Sub-Heading 1
+    - name: Example of another Sub-Heading 2
 ---
 This post shows how to add a table of contents as a sidebar.
 
