@@ -2,16 +2,17 @@
 layout: about
 title: about
 permalink: /
-subtitle: PhD student at <a href='https://groups.oist.jp/equip'>Experiemental Quantum Information Physics , Okinawa Institute of Science and Technology</a>.
+subtitle: PhD student at <a href='https://groups.oist.jp/equip'>Experiemental Quantum Information Physics</a>, Okinawa Institute of Science and Technology.
 
 profile:
   align: right
   image: prof_pic.jpg
   image_circular: true # crops the image to make it circular
   address: >
-    <p>555 your office number</p>
-    <p>123 your address street</p>
-    <p>Your City, State 12345</p>
+    <p>〒 904-0412</p>
+    <p>Japan, Okinawa</p>
+    <p>1919-1 Tancha, Onna son</p>
+    <p>OIST Village Center 451</p>
 
 news: true  # includes a list of news items
 latest_posts: true  # includes a list of the newest posts
