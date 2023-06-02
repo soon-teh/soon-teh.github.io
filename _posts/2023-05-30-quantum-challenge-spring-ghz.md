@@ -43,15 +43,18 @@ Running a quantum algorithm in the current noisy intermediate-scale quantum (NIS
 The `ibm_sherbrooke` system assigned to the challenge is a [127-qubit Eagle processor optimized for error mitigation](https://research.ibm.com/blog/eagle-quantum-error-mitigation). Instead of CNOT gates, unidirectional [echoed cross-resonance (ECR) gates](https://thequantumaviary.blogspot.com/2021/07/how-cross-resonance-gate-works.html) were implemented due to their simplicity and noise resilience. The coupling map of the device is shown below as a directional graph.
 
 <div class="l-body">
-  <img class="img-fluid" src="assets/img/2023-05-30/directional-coupling.png"></img>
+  <img class="img-fluid" src="/assets/img/2023-05-30/directional-coupling.png">
 </div>
 
-The implementation of these unidirectional ECR gates resulted in a interesting CNOT gate transpilation. Since CNOT gate is not a symmetrical gate, the transpilation depends on the direction of the CNOT gate. 
+The implementation of these unidirectional ECR gates resulted in an interesting CNOT gate transpilation. Since CNOT gate is not a symmetrical gate, the transpilation depends on the direction of the CNOT gate. Meanwhile, CNOT gate is transpiled into ECR and single qubit gate up to a global phase shift.
 
 <div class="l-body">
-  <img class="img-fluid" src="/assets/img/2023-05-30/cnot-transpile1.png"></img>
+  <img class="img-fluid" src="/assets/img/2023-05-30/cnot-transpile1.png">
+</div>
+<div class="l-body">
+  <img class="img-fluid" src="/assets/img/2023-05-30/cnot-transpile2.png">
 </div>
 
-For instance, the unidirectional ECR gate between the qubit 63 and 64 is implemented in the forward direction from 63 to 64. 
+For instance, the unidirectional ECR gate between the qubit $q_{63}$ and $q_{64}$ is implemented in the forward direction from $q_{63}$ to $q_{64}$. The CNOT gate transpilation with control at $q_{63}$ and target at $q_{64}$ resulted in only a depth 5 circuit while depth 7 when done in reversed.
 
 ### Generating a Large GHZ State
