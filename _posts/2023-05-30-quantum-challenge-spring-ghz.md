@@ -31,7 +31,6 @@ toc:
     - name: Example of another Sub-Heading 1
     - name: Example of another Sub-Heading 2
 ---
-This post shows how to add a table of contents as a sidebar.
 
 ## IBM Quantum Spring Challenge 2023
 [IBM Quantum Spring Challenge](https://research.ibm.com/blog/quantum-challenge-spring-2023) was a public event held from May 17 to May 24. This challenge is part of IBM Quantum's ongoing global education efforts and is free to participate in. The challenge's goal is to provide participants with a deeper understanding of a specific quantum topic.
@@ -43,11 +42,15 @@ Running a quantum algorithm in the current noisy intermediate-scale quantum (NIS
 ### 127-qubit Device
 The `ibm_sherbrooke` system assigned to the challenge is a [127-qubit Eagle processor optimized for error mitigation](https://research.ibm.com/blog/eagle-quantum-error-mitigation). Instead of CNOT gates, unidirectional [echoed cross-resonance (ECR) gates](https://thequantumaviary.blogspot.com/2021/07/how-cross-resonance-gate-works.html) were implemented due to their simplicity and noise resilience. The coupling map of the device is shown below as a directional graph.
 
-![](/assets/img/2023-05-30/directional-coupling.png) 
+<div class="l-body">
+  {% include figure.html path="assets/img/2023-05-30/directional-coupling.png" class="img-fluid z-depth-1" %}
+</div>
 
 The implementation of these unidirectional ECR gates resulted in a interesting CNOT gate transpilation. Since CNOT gate is not a symmetrical gate, the transpilation depends on the direction of the CNOT gate. 
 
-![](/assets/img/2023-05-30/cnot-transpile1.png) 
+<div class="l-body">
+  {% include figure.html path="/assets/img/2023-05-30/cnot-transpile1.png" class="img-fluid z-depth-1" %}
+</div>
 
 For instance, the  
 
