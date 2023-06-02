@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://soon-teh.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://soon-teh.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-02T03:08:20+00:00</updated><id>https://soon-teh.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://soon-teh.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://soon-teh.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-02T04:50:40+00:00</updated><id>https://soon-teh.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
 </subtitle><entry><title type="html">Generating GHZ state on IBM device</title><link href="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/" rel="alternate" type="text/html" title="Generating GHZ state on IBM device" /><published>2023-05-30T00:00:00+00:00</published><updated>2023-05-30T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz</id><content type="html" xml:base="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/"><![CDATA[<h2 id="ibm-quantum-spring-challenge-2023">IBM Quantum Spring Challenge 2023</h2>
 <p><a href="https://research.ibm.com/blog/quantum-challenge-spring-2023">IBM Quantum Spring Challenge</a> was a public event held from May 17 to May 24. This challenge is part of IBM Quantum’s ongoing global education efforts and is free to participate in. The challenge’s goal is to provide participants with a deeper understanding of a specific quantum topic.</p>
 
@@ -9,22 +9,33 @@
 <h3 id="127-qubit-device">127-qubit Device</h3>
 <p>The <code class="language-plaintext highlighter-rouge">ibm_sherbrooke</code> system assigned to the challenge is a <a href="https://research.ibm.com/blog/eagle-quantum-error-mitigation">127-qubit Eagle processor optimized for error mitigation</a>. Instead of CNOT gates, unidirectional <a href="https://thequantumaviary.blogspot.com/2021/07/how-cross-resonance-gate-works.html">echoed cross-resonance (ECR) gates</a> were implemented due to their simplicity and noise resilience. The coupling map of the device is shown below as a directional graph.</p>
 
-<div class="l-body">
-  <img class="img-fluid" src="/assets/img/2023-05-30/directional-coupling.png" />
-</div>
+<p><img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/directional-coupling.png" /><br /></p>
 
-<p>The implementation of these unidirectional ECR gates resulted in an interesting CNOT gate transpilation. Since CNOT gate is not a symmetrical gate, the transpilation depends on the direction of the CNOT gate. Meanwhile, CNOT gate is transpiled into ECR and single qubit gate up to a global phase shift.</p>
+<p>The implementation of these unidirectional ECR gates resulted in an interesting CNOT gate transpilation. Since CNOT gate is not a symmetric gate, the transpilation depends on the direction of the CNOT gate. Some transformation identities for assymetric gates are defined in <a href="https://qiskit.org/documentation/stubs/qiskit.transpiler.passes.GateDirection.html">GateDirection</a>.  Meanwhile, CNOT gate is transpiled into ECR and single qubit gate up to a global phase shift.</p>
 
-<div class="l-body">
-  <img class="img-fluid" src="/assets/img/2023-05-30/cnot-transpile1.png" />
-</div>
-<div class="l-body">
-  <img class="img-fluid" src="/assets/img/2023-05-30/cnot-transpile2.png" />
-</div>
+<p><img src="2023-06-02-12-10-32.png" alt="" />
+<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile1.png" />
+<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile2.png" /><br /></p>
 
-<p>For instance, the unidirectional ECR gate between the qubit $q_{63}$ and $q_{64}$ is implemented in the forward direction from $q_{63}$ to $q_{64}$. The CNOT gate transpilation with control at $q_{63}$ and target at $q_{64}$ resulted in only a depth 5 circuit while depth 7 when done in reversed.</p>
+<p>For instance, the unidirectional ECR gate between the qubit $q_{63}$ and $q_{64}$ is implemented in the forward direction from $q_{63}$ to $q_{64}$. The CNOT gate transpilation with control at $q_{63}$ and target at $q_{64}$ resulted in only a depth 5 circuit while depth 7 when reversed.</p>
 
-<h3 id="generating-a-large-ghz-state">Generating a Large GHZ State</h3>]]></content><author><name>Soon Teh</name></author><category term="qiskit" /><category term="quantum-challenge" /><summary type="html"><![CDATA[A look into the final lab of IBM Quantum Spring Challenge 2023]]></summary></entry><entry><title type="html">a distill-style blog post</title><link href="https://soon-teh.github.io/blog/2021/distill/" rel="alternate" type="text/html" title="a distill-style blog post" /><published>2021-05-22T00:00:00+00:00</published><updated>2021-05-22T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2021/distill</id><content type="html" xml:base="https://soon-teh.github.io/blog/2021/distill/"><![CDATA[<h2 id="equations">Equations</h2>
+<h3 id="ghz-state">GHZ State</h3>
+<p>The GHZ (Greenberger–Horne–Zeilinger) state is a specific type of quantum entangled state of multiple qubits named after the physicists Daniel Greenberger, Michael Horne, and Anton Zeilinger. The GHZ state is a maximally entangled state of the form</p>
+
+\[\frac{1}{\sqrt{2}}\left(|0\rangle^{\otimes n}+|1\rangle^{\otimes n}\right)\]
+
+<p>where $n$ is the number of qubits. One of the intriguing properties of the GHZ state is that it exhibits perfect correlations. That is, the measurement of one qubit resulted in the same outcome for all other qubits, which is a direct consequence of quantum entanglement.</p>
+
+<h2 id="generating-a-large-ghz-state">Generating a Large GHZ State</h2>
+<p>In the final lab of IBM Quantum Spring</p>
+
+<h3 id="breadth-first-search">Breadth-First Search</h3>
+
+<h3 id="dynamic-circuit">Dynamic Circuit</h3>
+<p>In conjunction with this year’s challenge theme on dynamic circuits, an optimal solution with constant scaling can be constructed with dynamic circuits regardless of the device size and configuration.</p>
+
+<h2 id="final-remarks">Final Remarks</h2>
+<p>The IBM Quantum Spring Challenge 2023 is an excellent opportunity for the community, beginners and professionals alike to learn about the latest development in quantum computing. Dynamic circuits being one of the new tools introduced in recent years, it would be exciting to see how they can advance the field of quantum computation. The implementation of the algorithms discussed for the generation of large GHZ state is available <a href="">here</a>.</p>]]></content><author><name>Soon Teh</name></author><category term="qiskit" /><category term="quantum-challenge" /><summary type="html"><![CDATA[A look into the final lab of IBM Quantum Spring Challenge 2023]]></summary></entry><entry><title type="html">a distill-style blog post</title><link href="https://soon-teh.github.io/blog/2021/distill/" rel="alternate" type="text/html" title="a distill-style blog post" /><published>2021-05-22T00:00:00+00:00</published><updated>2021-05-22T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2021/distill</id><content type="html" xml:base="https://soon-teh.github.io/blog/2021/distill/"><![CDATA[<h2 id="equations">Equations</h2>
 
 <p>This theme supports rendering beautiful math in inline and display modes using <a href="https://www.mathjax.org/">MathJax 3</a> engine.
 You just need to surround your math expression with <code class="language-plaintext highlighter-rouge">$$</code>, like <code class="language-plaintext highlighter-rouge">$$ E = mc^2 $$</code>.
