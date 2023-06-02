@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://soon-teh.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://soon-teh.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-02T04:50:40+00:00</updated><id>https://soon-teh.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://soon-teh.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://soon-teh.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-02T14:14:28+00:00</updated><id>https://soon-teh.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
 </subtitle><entry><title type="html">Generating GHZ state on IBM device</title><link href="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/" rel="alternate" type="text/html" title="Generating GHZ state on IBM device" /><published>2023-05-30T00:00:00+00:00</published><updated>2023-05-30T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz</id><content type="html" xml:base="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/"><![CDATA[<h2 id="ibm-quantum-spring-challenge-2023">IBM Quantum Spring Challenge 2023</h2>
 <p><a href="https://research.ibm.com/blog/quantum-challenge-spring-2023">IBM Quantum Spring Challenge</a> was a public event held from May 17 to May 24. This challenge is part of IBM Quantum’s ongoing global education efforts and is free to participate in. The challenge’s goal is to provide participants with a deeper understanding of a specific quantum topic.</p>
 
@@ -13,9 +13,8 @@
 
 <p>The implementation of these unidirectional ECR gates resulted in an interesting CNOT gate transpilation. Since CNOT gate is not a symmetric gate, the transpilation depends on the direction of the CNOT gate. Some transformation identities for assymetric gates are defined in <a href="https://qiskit.org/documentation/stubs/qiskit.transpiler.passes.GateDirection.html">GateDirection</a>.  Meanwhile, CNOT gate is transpiled into ECR and single qubit gate up to a global phase shift.</p>
 
-<p><img src="2023-06-02-12-10-32.png" alt="" />
-<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile1.png" />
-<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile2.png" /><br /></p>
+<p><img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile1.png" />
+<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile2.png" /></p>
 
 <p>For instance, the unidirectional ECR gate between the qubit $q_{63}$ and $q_{64}$ is implemented in the forward direction from $q_{63}$ to $q_{64}$. The CNOT gate transpilation with control at $q_{63}$ and target at $q_{64}$ resulted in only a depth 5 circuit while depth 7 when reversed.</p>
 
@@ -27,12 +26,21 @@
 <p>where $n$ is the number of qubits. One of the intriguing properties of the GHZ state is that it exhibits perfect correlations. That is, the measurement of one qubit resulted in the same outcome for all other qubits, which is a direct consequence of quantum entanglement.</p>
 
 <h2 id="generating-a-large-ghz-state">Generating a Large GHZ State</h2>
-<p>In the final lab of IBM Quantum Spring</p>
+<p>In the final lab of IBM Quantum Spring Challenge 2023, participants were tasked to generate a 54-qubit GHZ state on the 127-qubit real device. Only the even-numbered qubits are used for the GHZ state while the odd-numbered qubits as the stabilzers.</p>
+
+<p><img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/odd-even-qubits.png" /></p>
+
+<p>The oddness and evenness of the numbers are not to be confused (from the image, red: GHZ qubits; green: stabilizer qubits; and black: unused) with the indexing of the qubit. An unranked optional challenge to generate the GHZ state with the lowest depth can be attempted by motivated participants. Two approaches will be discussed in this post, one with $log(N)$ depth and the other with constant depth.</p>
 
 <h3 id="breadth-first-search">Breadth-First Search</h3>
 
 <h3 id="dynamic-circuit">Dynamic Circuit</h3>
 <p>In conjunction with this year’s challenge theme on dynamic circuits, an optimal solution with constant scaling can be constructed with dynamic circuits regardless of the device size and configuration.</p>
+
+<h3 id="gate-error-rate">Gate Error Rate</h3>
+<p>For superconducting qubits, not all qubits are created equal. The qubits vary in quality due to fabrication and calibration errors.</p>
+
+<p><img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/error-map.png" /><br /></p>
 
 <h2 id="final-remarks">Final Remarks</h2>
 <p>The IBM Quantum Spring Challenge 2023 is an excellent opportunity for the community, beginners and professionals alike to learn about the latest development in quantum computing. Dynamic circuits being one of the new tools introduced in recent years, it would be exciting to see how they can advance the field of quantum computation. The implementation of the algorithms discussed for the generation of large GHZ state is available <a href="">here</a>.</p>]]></content><author><name>Soon Teh</name></author><category term="qiskit" /><category term="quantum-challenge" /><summary type="html"><![CDATA[A look into the final lab of IBM Quantum Spring Challenge 2023]]></summary></entry><entry><title type="html">a distill-style blog post</title><link href="https://soon-teh.github.io/blog/2021/distill/" rel="alternate" type="text/html" title="a distill-style blog post" /><published>2021-05-22T00:00:00+00:00</published><updated>2021-05-22T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2021/distill</id><content type="html" xml:base="https://soon-teh.github.io/blog/2021/distill/"><![CDATA[<h2 id="equations">Equations</h2>

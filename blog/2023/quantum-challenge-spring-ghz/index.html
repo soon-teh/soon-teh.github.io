@@ -207,9 +207,8 @@
 
 <p>The implementation of these unidirectional ECR gates resulted in an interesting CNOT gate transpilation. Since CNOT gate is not a symmetric gate, the transpilation depends on the direction of the CNOT gate. Some transformation identities for assymetric gates are defined in <a href="https://qiskit.org/documentation/stubs/qiskit.transpiler.passes.GateDirection.html" rel="external nofollow noopener" target="_blank">GateDirection</a>.  Meanwhile, CNOT gate is transpiled into ECR and single qubit gate up to a global phase shift.</p>
 
-<p><img src="2023-06-02-12-10-32.png" alt="">
-<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile1.png">
-<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile2.png"><br></p>
+<p><img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile1.png">
+<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile2.png"></p>
 
 <p>For instance, the unidirectional ECR gate between the qubit $q_{63}$ and $q_{64}$ is implemented in the forward direction from $q_{63}$ to $q_{64}$. The CNOT gate transpilation with control at $q_{63}$ and target at $q_{64}$ resulted in only a depth 5 circuit while depth 7 when reversed.</p>
 
@@ -221,12 +220,21 @@
 <p>where $n$ is the number of qubits. One of the intriguing properties of the GHZ state is that it exhibits perfect correlations. That is, the measurement of one qubit resulted in the same outcome for all other qubits, which is a direct consequence of quantum entanglement.</p>
 
 <h2 id="generating-a-large-ghz-state">Generating a Large GHZ State</h2>
-<p>In the final lab of IBM Quantum Spring</p>
+<p>In the final lab of IBM Quantum Spring Challenge 2023, participants were tasked to generate a 54-qubit GHZ state on the 127-qubit real device. Only the even-numbered qubits are used for the GHZ state while the odd-numbered qubits as the stabilzers.</p>
+
+<p><img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/odd-even-qubits.png"></p>
+
+<p>The oddness and evenness of the numbers are not to be confused (from the image, red: GHZ qubits; green: stabilizer qubits; and black: unused) with the indexing of the qubit. An unranked optional challenge to generate the GHZ state with the lowest depth can be attempted by motivated participants. Two approaches will be discussed in this post, one with $log(N)$ depth and the other with constant depth.</p>
 
 <h3 id="breadth-first-search">Breadth-First Search</h3>
 
 <h3 id="dynamic-circuit">Dynamic Circuit</h3>
 <p>In conjunction with this year’s challenge theme on dynamic circuits, an optimal solution with constant scaling can be constructed with dynamic circuits regardless of the device size and configuration.</p>
+
+<h3 id="gate-error-rate">Gate Error Rate</h3>
+<p>For superconducting qubits, not all qubits are created equal. The qubits vary in quality due to fabrication and calibration errors.</p>
+
+<p><img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/error-map.png"><br></p>
 
 <h2 id="final-remarks">Final Remarks</h2>
 <p>The IBM Quantum Spring Challenge 2023 is an excellent opportunity for the community, beginners and professionals alike to learn about the latest development in quantum computing. Dynamic circuits being one of the new tools introduced in recent years, it would be exciting to see how they can advance the field of quantum computation. The implementation of the algorithms discussed for the generation of large GHZ state is available <a href="">here</a>.</p>
