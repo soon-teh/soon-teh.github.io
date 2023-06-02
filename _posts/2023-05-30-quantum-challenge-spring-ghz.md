@@ -25,11 +25,12 @@ toc:
   - name: IBM Quantum Spring Challenge 2023
     subsections:
     - name: 127-qubit Device
-    - name: Generating a Large GHZ State
-  - name: Customizing Your Table of Contents
+    - name: GHZ State
+  - name: Generating a Large GHZ State
     subsections:
-    - name: Example of another Sub-Heading 1
-    - name: Example of another Sub-Heading 2
+    - name: Breadth-First Search
+    - name: Dynamic Circuit
+  - name: Final Remarks
 ---
 
 ## IBM Quantum Spring Challenge 2023
@@ -42,19 +43,31 @@ Running a quantum algorithm in the current noisy intermediate-scale quantum (NIS
 ### 127-qubit Device
 The `ibm_sherbrooke` system assigned to the challenge is a [127-qubit Eagle processor optimized for error mitigation](https://research.ibm.com/blog/eagle-quantum-error-mitigation). Instead of CNOT gates, unidirectional [echoed cross-resonance (ECR) gates](https://thequantumaviary.blogspot.com/2021/07/how-cross-resonance-gate-works.html) were implemented due to their simplicity and noise resilience. The coupling map of the device is shown below as a directional graph.
 
-<div class="l-body">
-  <img class="img-fluid" src="/assets/img/2023-05-30/directional-coupling.png">
-</div>
+<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/directional-coupling.png"><br>
 
-The implementation of these unidirectional ECR gates resulted in an interesting CNOT gate transpilation. Since CNOT gate is not a symmetrical gate, the transpilation depends on the direction of the CNOT gate. Meanwhile, CNOT gate is transpiled into ECR and single qubit gate up to a global phase shift.
+The implementation of these unidirectional ECR gates resulted in an interesting CNOT gate transpilation. Since CNOT gate is not a symmetric gate, the transpilation depends on the direction of the CNOT gate. Some transformation identities for assymetric gates are defined in [GateDirection](https://qiskit.org/documentation/stubs/qiskit.transpiler.passes.GateDirection.html).  Meanwhile, CNOT gate is transpiled into ECR and single qubit gate up to a global phase shift.
 
-<div class="l-body">
-  <img class="img-fluid" src="/assets/img/2023-05-30/cnot-transpile1.png">
-</div>
-<div class="l-body">
-  <img class="img-fluid" src="/assets/img/2023-05-30/cnot-transpile2.png">
-</div>
+![](2023-06-02-12-10-32.png)
+<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile1.png">
+<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile2.png"><br>
 
-For instance, the unidirectional ECR gate between the qubit $q_{63}$ and $q_{64}$ is implemented in the forward direction from $q_{63}$ to $q_{64}$. The CNOT gate transpilation with control at $q_{63}$ and target at $q_{64}$ resulted in only a depth 5 circuit while depth 7 when done in reversed.
+For instance, the unidirectional ECR gate between the qubit $q_{63}$ and $q_{64}$ is implemented in the forward direction from $q_{63}$ to $q_{64}$. The CNOT gate transpilation with control at $q_{63}$ and target at $q_{64}$ resulted in only a depth 5 circuit while depth 7 when reversed.
 
-### Generating a Large GHZ State
+### GHZ State
+The GHZ (Greenberger–Horne–Zeilinger) state is a specific type of quantum entangled state of multiple qubits named after the physicists Daniel Greenberger, Michael Horne, and Anton Zeilinger. The GHZ state is a maximally entangled state of the form
+
+$$\frac{1}{\sqrt{2}}\left(|0\rangle^{\otimes n}+|1\rangle^{\otimes n}\right)$$
+
+where $n$ is the number of qubits. One of the intriguing properties of the GHZ state is that it exhibits perfect correlations. That is, the measurement of one qubit resulted in the same outcome for all other qubits, which is a direct consequence of quantum entanglement.
+
+## Generating a Large GHZ State
+In the final lab of IBM Quantum Spring
+
+### Breadth-First Search
+
+
+### Dynamic Circuit
+In conjunction with this year's challenge theme on dynamic circuits, an optimal solution with constant scaling can be constructed with dynamic circuits regardless of the device size and configuration. 
+
+## Final Remarks
+The IBM Quantum Spring Challenge 2023 is an excellent opportunity for the community, beginners and professionals alike to learn about the latest development in quantum computing. Dynamic circuits being one of the new tools introduced in recent years, it would be exciting to see how they can advance the field of quantum computation. The implementation of the algorithms discussed for the generation of large GHZ state is available [here]().
