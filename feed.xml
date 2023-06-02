@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://soon-teh.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://soon-teh.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-02T02:37:23+00:00</updated><id>https://soon-teh.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://soon-teh.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://soon-teh.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-02T02:46:44+00:00</updated><id>https://soon-teh.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
 </subtitle><entry><title type="html">Generating GHZ state on IBM device</title><link href="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/" rel="alternate" type="text/html" title="Generating GHZ state on IBM device" /><published>2023-05-30T00:00:00+00:00</published><updated>2023-05-30T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz</id><content type="html" xml:base="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/"><![CDATA[<h2 id="ibm-quantum-spring-challenge-2023">IBM Quantum Spring Challenge 2023</h2>
 <p><a href="https://research.ibm.com/blog/quantum-challenge-spring-2023">IBM Quantum Spring Challenge</a> was a public event held from May 17 to May 24. This challenge is part of IBM Quantum’s ongoing global education efforts and is free to participate in. The challenge’s goal is to provide participants with a deeper understanding of a specific quantum topic.</p>
 
@@ -10,46 +10,16 @@
 <p>The <code class="language-plaintext highlighter-rouge">ibm_sherbrooke</code> system assigned to the challenge is a <a href="https://research.ibm.com/blog/eagle-quantum-error-mitigation">127-qubit Eagle processor optimized for error mitigation</a>. Instead of CNOT gates, unidirectional <a href="https://thequantumaviary.blogspot.com/2021/07/how-cross-resonance-gate-works.html">echoed cross-resonance (ECR) gates</a> were implemented due to their simplicity and noise resilience. The coupling map of the device is shown below as a directional graph.</p>
 
 <div class="l-body">
-  <figure>
-
-  <picture>
-    
-    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/2023-05-30/directional-coupling-480.webp" />
-    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/2023-05-30/directional-coupling-800.webp" />
-    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/2023-05-30/directional-coupling-1400.webp" />
-    
-
-    <!-- Fallback to the original file -->
-    <img src="/assets/img/2023-05-30/directional-coupling.png" class="img-fluid z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
-
-  </picture>
-
-</figure>
-
+  <img class="img-fluid" src="assets/img/2023-05-30/directional-coupling.png" />&lt;/img&gt;
 </div>
 
 <p>The implementation of these unidirectional ECR gates resulted in a interesting CNOT gate transpilation. Since CNOT gate is not a symmetrical gate, the transpilation depends on the direction of the CNOT gate.</p>
 
 <div class="l-body">
-  <figure>
-
-  <picture>
-    
-    <source class="responsive-img-srcset" media="(max-width: 480px)" srcset="/assets/img/2023-05-30/cnot-transpile1-480.webp" />
-    <source class="responsive-img-srcset" media="(max-width: 800px)" srcset="/assets/img/2023-05-30/cnot-transpile1-800.webp" />
-    <source class="responsive-img-srcset" media="(max-width: 1400px)" srcset="/assets/img/2023-05-30/cnot-transpile1-1400.webp" />
-    
-
-    <!-- Fallback to the original file -->
-    <img src="/assets/img/2023-05-30/cnot-transpile1.png" class="img-fluid z-depth-1" width="auto" height="auto" onerror="this.onerror=null; $('.responsive-img-srcset').remove();" />
-
-  </picture>
-
-</figure>
-
+  <img class="img-fluid" src="/assets/img/2023-05-30/cnot-transpile1.png" />&lt;/img&gt;
 </div>
 
-<p>For instance, the</p>
+<p>For instance, the unidirectional ECR gate between the qubit 63 and 64 is implemented in the forward direction from 63 to 64.</p>
 
 <h3 id="generating-a-large-ghz-state">Generating a Large GHZ State</h3>]]></content><author><name>Soon Teh</name></author><category term="qiskit" /><category term="quantum-challenge" /><summary type="html"><![CDATA[A look into the final lab of IBM Quantum Spring Challenge 2023]]></summary></entry><entry><title type="html">a distill-style blog post</title><link href="https://soon-teh.github.io/blog/2021/distill/" rel="alternate" type="text/html" title="a distill-style blog post" /><published>2021-05-22T00:00:00+00:00</published><updated>2021-05-22T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2021/distill</id><content type="html" xml:base="https://soon-teh.github.io/blog/2021/distill/"><![CDATA[<h2 id="equations">Equations</h2>
 
