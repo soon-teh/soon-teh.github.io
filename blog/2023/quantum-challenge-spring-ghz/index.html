@@ -202,16 +202,19 @@
 <p>The <code class="language-plaintext highlighter-rouge">ibm_sherbrooke</code> system assigned to the challenge is a <a href="https://research.ibm.com/blog/eagle-quantum-error-mitigation" rel="external nofollow noopener" target="_blank">127-qubit Eagle processor optimized for error mitigation</a>. Instead of CNOT gates, unidirectional <a href="https://thequantumaviary.blogspot.com/2021/07/how-cross-resonance-gate-works.html" rel="external nofollow noopener" target="_blank">echoed cross-resonance (ECR) gates</a> were implemented due to their simplicity and noise resilience. The coupling map of the device is shown below as a directional graph.</p>
 
 <div class="l-body">
-  <img class="img-fluid" src="assets/img/2023-05-30/directional-coupling.png">&lt;/img&gt;
+  <img class="img-fluid" src="/assets/img/2023-05-30/directional-coupling.png">
 </div>
 
-<p>The implementation of these unidirectional ECR gates resulted in a interesting CNOT gate transpilation. Since CNOT gate is not a symmetrical gate, the transpilation depends on the direction of the CNOT gate.</p>
+<p>The implementation of these unidirectional ECR gates resulted in an interesting CNOT gate transpilation. Since CNOT gate is not a symmetrical gate, the transpilation depends on the direction of the CNOT gate. Meanwhile, CNOT gate is transpiled into ECR and single qubit gate up to a global phase shift.</p>
 
 <div class="l-body">
-  <img class="img-fluid" src="/assets/img/2023-05-30/cnot-transpile1.png">&lt;/img&gt;
+  <img class="img-fluid" src="/assets/img/2023-05-30/cnot-transpile1.png">
+</div>
+<div class="l-body">
+  <img class="img-fluid" src="/assets/img/2023-05-30/cnot-transpile2.png">
 </div>
 
-<p>For instance, the unidirectional ECR gate between the qubit 63 and 64 is implemented in the forward direction from 63 to 64.</p>
+<p>For instance, the unidirectional ECR gate between the qubit $q_{63}$ and $q_{64}$ is implemented in the forward direction from $q_{63}$ to $q_{64}$. The CNOT gate transpilation with control at $q_{63}$ and target at $q_{64}$ resulted in only a depth 5 circuit while depth 7 when done in reversed.</p>
 
 <h3 id="generating-a-large-ghz-state">Generating a Large GHZ State</h3>
 
