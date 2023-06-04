@@ -64,7 +64,7 @@ In the final lab of IBM Quantum Spring Challenge 2023, participants were tasked 
 
 <img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/odd-even-qubits.png">
 
-The oddness and evenness of the numbers are not to be confused (from the image, red: GHZ qubits; green: stabilizer qubits; and black: unused) with the indexing of the qubit. An unranked optional challenge to generate the GHZ state with the lowest depth can be attempted by motivated participants. Two approaches will be discussed in this post, one with $log(N)$ depth and the other with constant depth.
+The oddness and evenness of the numbers are not to be confused (from the image, red: GHZ qubits; green: stabilizer qubits; and black: unused) with the indexing of the qubit. An unranked optional challenge to generate the GHZ state with the lowest depth can be attempted by motivated participants. Two approaches will be discussed in this post, one with $log(N)$ depth and the other with constant depth with respect to the qubit size $N$.
 
 ### Breadth-First Search
 
