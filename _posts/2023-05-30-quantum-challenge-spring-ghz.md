@@ -43,12 +43,12 @@ Running a quantum algorithm in the current noisy intermediate-scale quantum (NIS
 ### 127-qubit Device
 The `ibm_sherbrooke` system assigned to the challenge is a [127-qubit Eagle processor optimized for error mitigation](https://research.ibm.com/blog/eagle-quantum-error-mitigation). Instead of CNOT gates, unidirectional [echoed cross-resonance (ECR) gates](https://thequantumaviary.blogspot.com/2021/07/how-cross-resonance-gate-works.html) were implemented due to their simplicity and noise resilience. The coupling map of the device is shown below as a directional graph.
 
-<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/directional-coupling.png"><br>
+<img class="img-fluid mx-auto mb-2" src="/assets/img/2023-05-30/directional-coupling.png"><br>
 
 The implementation of these unidirectional ECR gates resulted in an interesting CNOT gate transpilation. Since CNOT gate is not a symmetric gate, the transpilation depends on the direction of the CNOT gate. Some transformation identities for assymetric gates are defined in [GateDirection](https://qiskit.org/documentation/stubs/qiskit.transpiler.passes.GateDirection.html).  Meanwhile, CNOT gate is transpiled into ECR and single qubit gate up to a global phase shift.
 
-<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile1.png">
-<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/cnot-transpile2.png">
+<img class="img-fluid mx-auto mb-2" src="/assets/img/2023-05-30/cnot-transpile1.png">
+<img class="img-fluid mx-auto mb-2" src="/assets/img/2023-05-30/cnot-transpile2.png">
 
 For instance, the unidirectional ECR gate between the qubit $q_{63}$ and $q_{64}$ is implemented in the forward direction from $q_{63}$ to $q_{64}$. The CNOT gate transpilation with control at $q_{63}$ and target at $q_{64}$ resulted in only a depth 5 circuit while depth 7 when reversed.
 
@@ -62,21 +62,62 @@ where $n$ is the number of qubits. One of the intriguing properties of the GHZ s
 ## Generating a Large GHZ State
 In the final lab of IBM Quantum Spring Challenge 2023, participants were tasked to generate a 54-qubit GHZ state on the 127-qubit real device. Only the even-numbered qubits are used for the GHZ state while the odd-numbered qubits as the stabilzers. 
 
-<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/odd-even-qubits.png">
+<img class="img-fluid mx-auto mb-2" src="/assets/img/2023-05-30/odd-even-qubits.png">
 
 The oddness and evenness of the numbers are not to be confused (from the image, red: GHZ qubits; green: stabilizer qubits; and black: unused) with the indexing of the qubit. An unranked optional challenge to generate the GHZ state with the lowest depth can be attempted by motivated participants. Two approaches will be discussed in this post, one with $log(N)$ depth and another of constant depth with respect to the qubit size $N$.
 
 ### Breadth-First Search
-<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/bfs-cnot.gif">
+
+A GHZ state can be constructed by expanding upon the Bell state preparation circuit.
+<img class="img-fluid mx-auto mb-2" src="/assets/img/2023-05-30/bfs-cnot.gif">
 
 
 ### Dynamic Circuit
-In conjunction with this year's challenge theme on dynamic circuits, an optimal solution with constant scaling can be constructed with dynamic circuits regardless of the device size and configuration. 
+In conjunction with this year's challenge theme on dynamic circuits, an optimal solution with constant scaling can be constructed with dynamic circuits independent of the device size. First, the qubits are sorted into two groups: entangling and parity qubits by their odd-evenness, coinciding with the labeling of GHZ and stabilizer qubits. The algorithm for achieving the GHZ state is described below as
+1. Apply Hadamard gate to all the entangling qubits
+2. Apply CNOT gate to the parity qubits using the neighboring entangling qubit as the control
+3. Measure all the parity qubits
+4. Apply the parity X gate to the qubits depending on the measurement outcome
 
-### Gate Error Rate
+The circuit diagram gives an example of a 3 qubit GHZ state with 2 stabilizer qubits
+
+<img class="img-fluid mx-auto mb-2" src="/assets/img/2023-05-30/ghz-cif.png">
+
+where the parity X gates are drawn explicitly using a soon-to-be deprecated `c_if` for clarity. The evolution of the states then follows as
+
+$$
+\begin{align*}
+|00000\rangle \xrightarrow{\text{Hadamard}} &\, |00000\rangle+|00001\rangle+|00100\rangle+|01101\rangle+|10000\rangle+|10001\rangle+|10100\rangle+|10101\rangle \\
+\xrightarrow{\text{CNOT}} &\, |00000\rangle+|00011\rangle+|01110\rangle+|01101\rangle+|11000\rangle+|11011\rangle+|10110\rangle+|10101\rangle \\
+=&\, |000\rangle_{\text{ent}}|00\rangle_{\text{parity}}+|001\rangle_{\text{ent}}|01\rangle_{\text{parity}}+|010\rangle_{\text{ent}}|11\rangle_{\text{parity}}+|011\rangle_{\text{ent}}|10\rangle_{\text{parity}}+|100\rangle_{\text{ent}}|10\rangle_{\text{parity}}+|101\rangle_{\text{ent}}|11\rangle_{\text{parity}}+|110\rangle_{\text{ent}}|01\rangle_{\text{parity}}+|111\rangle_{\text{ent}}|00\rangle_{\text{parity}} \\
+\xrightarrow{\text{Parity X gate}}|&\, 00000\rangle+|10101\rangle
+\end{align*}
+$$
+
+Parity X gate is defined as a dynamic circuit where
+
+$$
+\prod_i X_{\text{ent}(i+1)}^{\oplus_i M(i)} X_{\text{partity}(i)}^{M(i)}
+$$
+
+Here, $M(i)$ is the measurement outcome of the $i$-th parity qubit, and $\oplus_i M(i)$ gives the modulo 2 sum of the parity qubits up til the $i$-th bit. For instance, the parity X gate acting on the state $|010\rangle_{\text{ent}}|11\rangle_{\text{parity}}$ state is given by
+
+$$
+X_{\text{ent}(2)} |010\rangle_{\text{ent}} \otimes X_{\text{partity}(2)} X_{\text{partity}(1)}|11\rangle_{\text{parity}} = |000\rangle_{\text{ent}}|00\rangle_{\text{parity}} = |00000\rangle
+$$
+
+Interestingly, the parity X gate acts at most a single X gate on each qubit, yielding a depth-1 gate upon transpilation. Noting that the parity X gate depends on the parity measurement, a dynamic circuit using the (switch/case)[https://qiskit.org/documentation/stubs/qiskit.circuit.QuantumCircuit.switch.html#qiskit-circuit-quantumcircuit-switch] can be implemented.
+
+<div class="col-md-4">
+<img class="img-responsive" src="/assets/img/2023-05-30/ghz-switch.png">
+</div>
+
+Since at the time of writing the backend (`Aer 0.12.0` does not support `SwitchCaseOp`)[https://github.com/Qiskit/qiskit-aer/pull/1778], the code implementation based on `if_test` and `c_if` is also included for demonstration.
+
+<!-- ### Gate Error Rate
 For superconducting qubits, not all qubits are created equal. The qubits vary in quality due to fabrication and calibration errors.
 
-<img class="img-fluid mx-auto mb-4" src="/assets/img/2023-05-30/error-map.png"><br>
+<img class="img-fluid mx-auto mb-2" src="/assets/img/2023-05-30/error-map.png"><br> -->
 
 ## Final Remarks
 The IBM Quantum Spring Challenge 2023 is an excellent opportunity for the community, beginners and professionals alike to learn about the latest development in quantum computing. Dynamic circuits being one of the new tools introduced in recent years, it would be exciting to see how they can advance the field of quantum computation. The implementation of the algorithms discussed for the generation of large GHZ state is available [here]().
