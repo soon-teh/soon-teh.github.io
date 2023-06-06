@@ -64,6 +64,7 @@
     <style type="text/css">
       .post-img {
   max-height: 60vh;
+  max-width: 90%;
 }
 
     </style>
@@ -224,6 +225,8 @@
 
 <p>A GHZ state can be constructed by expanding upon the Bell state preparation circuit.</p>
 
+<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-05-30/centrality.png"></p>
+
 <p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-05-30/bfs-cnot.gif"></p>
 
 <h3 id="dynamic-circuit">Dynamic Circuit</h3>
@@ -274,9 +277,11 @@
 
 <p>The switch/case control flow acts similarly to the switch case in most programming languages and allows for an elegant way of implementing the parity X gate. However, at the time of writing, the backend <a href="https://github.com/Qiskit/qiskit-aer/pull/1778" rel="external nofollow noopener" target="_blank"><code class="language-plaintext highlighter-rouge">Aer 0.12.0</code> does not support <code class="language-plaintext highlighter-rouge">SwitchCaseOp</code></a>. So, the code implementation based on <code class="language-plaintext highlighter-rouge">if_test</code> and <code class="language-plaintext highlighter-rouge">c_if</code> are included for demonstration.</p>
 
-<p>The use of dynamic circuits for GHZ generation reduced the depth required to a fixed value independent of the size, provided one can find a route that visits every node once exists. This is exactly the <a href="https://en.wikipedia.org/wiki/Hamiltonian_path_problem" rel="external nofollow noopener" target="_blank">Hamiltonian path problem</a> which is known to be NP-hard. In general, the Hamiltonian path is not guaranteed to exist. Instead, one can find the longest possible non-overlapping path<d-footnote>The [longest path problem](https://en.wikipedia.org/wiki/Longest_path_problem) is also NP-hard, but it always exists unlike Hamiltonian path, and a "long enough" path is sufficient in most cases.</d-footnote>, ensuring a maximal number of qubits entangled with the dynamic circuits. The rest of the qubits can then be entangled with usual CNOT gates, imposing a small overhead on the circuit depth.</p>
+<p>The use of dynamic circuits for GHZ generation reduced the depth required to a fixed value independent of the size, provided one can find a route that visits every node once exists. This is exactly the <a href="https://en.wikipedia.org/wiki/Hamiltonian_path_problem" rel="external nofollow noopener" target="_blank">Hamiltonian path problem</a> which is known to be NP-hard. In general, the Hamiltonian path is not guaranteed to exist. Instead, one can find the longest possible non-overlapping path<d-footnote>The longest path problem is also NP-hard, but it always exists unlike Hamiltonian path, and a "long enough" path is sufficient in most cases.</d-footnote>, ensuring a maximal number of qubits entangled with the dynamic circuits. The rest of the qubits can then be entangled with usual CNOT gates, imposing a small overhead on the circuit depth.</p>
 
-<p>For <code class="language-plaintext highlighter-rouge">ibm_sherbrooke</code>, the longest path found is shown above. Uncoupled qubits can then be entangled in the next step with CNOT gates, introducing an overhead of depth 1.</p>
+<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-05-30/chain.png"></p>
+
+<p>For <code class="language-plaintext highlighter-rouge">ibm_sherbrooke</code>, one possible solution to the longest path is shown above, tracing the red edges. Uncoupled qubits following the blue edges can then be entangled in the next step with CNOT gates, introducing an overhead of depth 1.</p>
 
 <h2 id="final-remarks">Final Remarks</h2>
 <p>The IBM Quantum Spring Challenge 2023 is an excellent opportunity for the community, beginners and professionals alike to learn about the latest development in quantum computing. Dynamic circuits being one of the new tools introduced in recent years, it would be exciting to see how they can advance the field of quantum computation. The implementation of the algorithms discussed for the generation of large GHZ state is available <a href="">here</a>.</p>
