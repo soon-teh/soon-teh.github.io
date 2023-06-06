@@ -34,8 +34,8 @@ toc:
 
 _styles: >
   .post-img {
-    max-height: 60vh;
-    max-width: 90%;
+    max-height: 80vh;
+    max-width: 100%;
   }
 ---
 
@@ -115,7 +115,7 @@ $$
 \prod_i X_{\text{ent}(i+1)}^{\oplus_i M(i)} X_{\text{partity}(i)}^{M(i)}
 $$
 
-Here, $M(i)$ is the measurement outcome of the $i$-th parity qubit, and $\oplus_i M(i)$ gives the modulo 2 sum of the parity qubits up til the $i$-th bit. For instance, the parity X gate acting on the $|010\rangle_{\text{ent}}|11\rangle_{\text{parity}}$ state is given by
+Here, $M(i)$ is the measurement outcome of the $i$-th parity qubit, and $\oplus_i M(i)$ gives the modulo 2 sum of the parity qubits up til the $i$-th bit. For instance, the parity X gate acting on the $\|010\rangle_{\text{ent}}$ $|11\rangle_{\text{parity}}$ state is given by
 
 $$
 X_{\text{ent}(2)} |010\rangle_{\text{ent}} \otimes X_{\text{partity}(2)} X_{\text{partity}(1)}|11\rangle_{\text{parity}} = |000\rangle_{\text{ent}}|00\rangle_{\text{parity}} = |00000\rangle
