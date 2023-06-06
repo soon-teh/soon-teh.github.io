@@ -33,9 +33,9 @@ toc:
   - name: Final Remarks
 
 _styles: >
-.post-img {
-  max-height: 60vh;
-}
+  .post-img {
+    max-height: 60vh;
+  }
 ---
 
 
