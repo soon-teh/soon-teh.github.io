@@ -35,6 +35,7 @@ toc:
 _styles: >
   .post-img {
     max-height: 60vh;
+    max-width: 90%;
   }
 ---
 
@@ -76,6 +77,8 @@ The oddness and evenness of the numbers are not to be confused (from the image, 
 ### Breadth-First Search
 
 A GHZ state can be constructed by expanding upon the Bell state preparation circuit.
+
+<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-05-30/centrality.png">
 
 <img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-05-30/bfs-cnot.gif">
 
@@ -124,9 +127,11 @@ Interestingly, the parity X gate acts at most a single X gate on each qubit, yie
 
 The switch/case control flow acts similarly to the switch case in most programming languages and allows for an elegant way of implementing the parity X gate. However, at the time of writing, the backend [`Aer 0.12.0` does not support `SwitchCaseOp`](https://github.com/Qiskit/qiskit-aer/pull/1778). So, the code implementation based on `if_test` and `c_if` are included for demonstration.
 
-The use of dynamic circuits for GHZ generation reduced the depth required to a fixed value independent of the size, provided one can find a route that visits every node once exists. This is exactly the [Hamiltonian path problem](https://en.wikipedia.org/wiki/Hamiltonian_path_problem) which is known to be NP-hard. In general, the Hamiltonian path is not guaranteed to exist. Instead, one can find the longest possible non-overlapping path<d-footnote>The [longest path problem](https://en.wikipedia.org/wiki/Longest_path_problem) is also NP-hard, but it always exists unlike Hamiltonian path, and a "long enough" path is sufficient in most cases.</d-footnote>, ensuring a maximal number of qubits entangled with the dynamic circuits. The rest of the qubits can then be entangled with usual CNOT gates, imposing a small overhead on the circuit depth. 
+The use of dynamic circuits for GHZ generation reduced the depth required to a fixed value independent of the size, provided one can find a route that visits every node once exists. This is exactly the [Hamiltonian path problem](https://en.wikipedia.org/wiki/Hamiltonian_path_problem) which is known to be NP-hard. In general, the Hamiltonian path is not guaranteed to exist. Instead, one can find the longest possible non-overlapping path<d-footnote>The longest path problem is also NP-hard, but it always exists unlike Hamiltonian path, and a "long enough" path is sufficient in most cases.</d-footnote>, ensuring a maximal number of qubits entangled with the dynamic circuits. The rest of the qubits can then be entangled with usual CNOT gates, imposing a small overhead on the circuit depth. 
 
-For `ibm_sherbrooke`, the longest path found is shown above. Uncoupled qubits can then be entangled in the next step with CNOT gates, introducing an overhead of depth 1.
+<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-05-30/chain.png">
+
+For `ibm_sherbrooke`, one possible solution to the longest path is shown above, tracing the red edges. Uncoupled qubits following the blue edges can then be entangled in the next step with CNOT gates, introducing an overhead of depth 1.
 
 ## Final Remarks
 The IBM Quantum Spring Challenge 2023 is an excellent opportunity for the community, beginners and professionals alike to learn about the latest development in quantum computing. Dynamic circuits being one of the new tools introduced in recent years, it would be exciting to see how they can advance the field of quantum computation. The implementation of the algorithms discussed for the generation of large GHZ state is available [here]().
