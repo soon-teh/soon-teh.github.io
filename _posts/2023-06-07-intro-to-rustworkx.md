@@ -2,7 +2,7 @@
 layout: distill
 title: Introduction to rustworkx
 date: 2023-06-07
-description: With examples on IBM quantum devices
+description: With examples and applications in quantum computing
 categories: qiskit rustworkx
 giscus_comments: false
 toc:
@@ -62,9 +62,11 @@ The circles in the diagram is a _node_ that represents a physical qubit on the d
 <img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/auckland-error.png"><br>
 
 The standard graph algorithms perform summation across the edges of non-negative weights. Thus, the weights, $w$ are defined as the negative log of the CNOT gate success rate:
+
 $$
 w_{ij}=-\log(1-p_{ij})
 $$
+
 where $p_{ij}$ is the CNOT gate error rate for the control qubit $i$ and target qubit $j$. Under this convention, smaller weights corresponds to higher success probability. For simplicity, the coupling map will be converted to a undirected graph because of the symmetry of the CNOT gate error rate for `ibm_auckland`. Special care taking into consideration of the gate asymmetry is needed for hardware such as the [Eagle processor](https://research.ibm.com/blog/eagle-quantum-error-mitigation), which utilizes uni-directional echoed cross-resonance (ECR) gates.
 
 ```python
@@ -111,7 +113,38 @@ An empty undirected graph `PyGraph` object was first created and populated with 
 ### 4 Color Theorem
 
 ### Pauli Grouping
-<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/apac.png"><br>
+Commuting variables can be measured simultaneously. The grouping of commuting Pauli strings is useful for measurement reduction.
+
+```python
+from qiskit.quantum_info import PauliList
+op = PauliList(["XX", "YY", "IZ", "ZZ", "ZX"])
+```
+
+Coloring a planar graph is still a NP-hard problem, but a heuristic algorithm can be employed to obtain a good coloring. The greedy algorithm is one such algorithm that is simple and fast. The algorithm starts with an empty coloring and iteratively colors the nodes with the lowest possible color. The algorithm is guaranteed to produce a coloring that is at most one more than the optimal coloring. The algorithm is implemented in rustworkx and can be accessed via `graph_greedy_color`. 
+
+```python
+import matplotlib as mpl
+cmap = mpl.cm.get_cmap('tab10')
+
+def node_attr(node):
+    rgba = mpl.colors.to_hex(cmap(coloring_dict[node]))
+    return {'label': str(op[node].to_label()), 
+            'shape': 'circle', 
+            # 'color': f"\"{rgba}\"", 
+            'fillcolor': f"\"{rgba}\"", 
+            'style': 'filled',
+            'width': '0.9'}
+
+
+graph = op._create_graph(False)
+coloring_dict = rx.graph_greedy_color(graph)
+print(len(set(coloring_dict.values())))
+graphviz_draw(graph, node_attr_fn=node_attr, graph_attr={'rankdir': 'LR'})
+```
+
+<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/pauli-grouping.png"><br>
+
+This is the exact implementation of `PauliList.group_commuting` under Qiskit.
 
 ### Variational Quantum Eigensolver
 
