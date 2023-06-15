@@ -10,7 +10,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>Introduction to rustworkx | Soon  Teh</title>
     <meta name="author" content="Soon  Teh">
-    <meta name="description" content="With examples on IBM quantum devices">
+    <meta name="description" content="With examples and applications in quantum computing">
 
 
     <!-- Bootstrap & MDB -->
@@ -74,7 +74,7 @@
 <d-front-matter>
     <script async type="text/json">{
       "title": "Introduction to rustworkx",
-      "description": "With examples on IBM quantum devices",
+      "description": "With examples and applications in quantum computing",
       "published": "June 7, 2023",
       "authors": [
         {
@@ -162,7 +162,7 @@
 
       <d-title>
         <h1>Introduction to rustworkx</h1>
-        <p>With examples on IBM quantum devices</p>
+        <p>With examples and applications in quantum computing</p>
       </d-title>
 
       <d-byline></d-byline>
@@ -203,9 +203,11 @@
 
 <p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/auckland-error.png"><br></p>
 
-<p>The standard graph algorithms perform summation across the edges of non-negative weights. Thus, the weights, $w$ are defined as the negative log of the CNOT gate success rate:
-\(w_{ij}=-\log(1-p_{ij})\)
-where $p_{ij}$ is the CNOT gate error rate for the control qubit $i$ and target qubit $j$. Under this convention, smaller weights corresponds to higher success probability. For simplicity, the coupling map will be converted to a undirected graph because of the symmetry of the CNOT gate error rate for <code class="language-plaintext highlighter-rouge">ibm_auckland</code>. Special care taking into consideration of the gate asymmetry is needed for hardware such as the <a href="https://research.ibm.com/blog/eagle-quantum-error-mitigation" rel="external nofollow noopener" target="_blank">Eagle processor</a>, which utilizes uni-directional echoed cross-resonance (ECR) gates.</p>
+<p>The standard graph algorithms perform summation across the edges of non-negative weights. Thus, the weights, $w$ are defined as the negative log of the CNOT gate success rate:</p>
+
+\[w_{ij}=-\log(1-p_{ij})\]
+
+<p>where $p_{ij}$ is the CNOT gate error rate for the control qubit $i$ and target qubit $j$. Under this convention, smaller weights corresponds to higher success probability. For simplicity, the coupling map will be converted to a undirected graph because of the symmetry of the CNOT gate error rate for <code class="language-plaintext highlighter-rouge">ibm_auckland</code>. Special care taking into consideration of the gate asymmetry is needed for hardware such as the <a href="https://research.ibm.com/blog/eagle-quantum-error-mitigation" rel="external nofollow noopener" target="_blank">Eagle processor</a>, which utilizes uni-directional echoed cross-resonance (ECR) gates.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
 <span class="kn">import</span> <span class="n">rustworkx</span> <span class="k">as</span> <span class="n">rx</span>
@@ -248,7 +250,36 @@ where $p_{ij}$ is the CNOT gate error rate for the control qubit $i$ and target 
 <h3 id="4-color-theorem">4 Color Theorem</h3>
 
 <h3 id="pauli-grouping">Pauli Grouping</h3>
-<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/apac.png"><br></p>
+<p>Commuting variables can be measured simultaneously. The grouping of commuting Pauli strings is useful for measurement reduction.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">qiskit.quantum_info</span> <span class="kn">import</span> <span class="n">PauliList</span>
+<span class="n">op</span> <span class="o">=</span> <span class="nc">PauliList</span><span class="p">([</span><span class="sh">"</span><span class="s">XX</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">YY</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">IZ</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">ZZ</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">ZX</span><span class="sh">"</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>Coloring a planar graph is still a NP-hard problem, but a heuristic algorithm can be employed to obtain a good coloring. The greedy algorithm is one such algorithm that is simple and fast. The algorithm starts with an empty coloring and iteratively colors the nodes with the lowest possible color. The algorithm is guaranteed to produce a coloring that is at most one more than the optimal coloring. The algorithm is implemented in rustworkx and can be accessed via <code class="language-plaintext highlighter-rouge">graph_greedy_color</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">matplotlib</span> <span class="k">as</span> <span class="n">mpl</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">mpl</span><span class="p">.</span><span class="n">cm</span><span class="p">.</span><span class="nf">get_cmap</span><span class="p">(</span><span class="sh">'</span><span class="s">tab10</span><span class="sh">'</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">node_attr</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+    <span class="n">rgba</span> <span class="o">=</span> <span class="n">mpl</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="nf">to_hex</span><span class="p">(</span><span class="nf">cmap</span><span class="p">(</span><span class="n">coloring_dict</span><span class="p">[</span><span class="n">node</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="p">{</span><span class="sh">'</span><span class="s">label</span><span class="sh">'</span><span class="p">:</span> <span class="nf">str</span><span class="p">(</span><span class="n">op</span><span class="p">[</span><span class="n">node</span><span class="p">].</span><span class="nf">to_label</span><span class="p">()),</span> 
+            <span class="sh">'</span><span class="s">shape</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">circle</span><span class="sh">'</span><span class="p">,</span> 
+            <span class="c1"># 'color': f"\"{rgba}\"", 
+</span>            <span class="sh">'</span><span class="s">fillcolor</span><span class="sh">'</span><span class="p">:</span> <span class="sa">f</span><span class="sh">"</span><span class="se">\"</span><span class="si">{</span><span class="n">rgba</span><span class="si">}</span><span class="se">\"</span><span class="sh">"</span><span class="p">,</span> 
+            <span class="sh">'</span><span class="s">style</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">filled</span><span class="sh">'</span><span class="p">,</span>
+            <span class="sh">'</span><span class="s">width</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">0.9</span><span class="sh">'</span><span class="p">}</span>
+
+
+<span class="n">graph</span> <span class="o">=</span> <span class="n">op</span><span class="p">.</span><span class="nf">_create_graph</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">coloring_dict</span> <span class="o">=</span> <span class="n">rx</span><span class="p">.</span><span class="nf">graph_greedy_color</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="nf">set</span><span class="p">(</span><span class="n">coloring_dict</span><span class="p">.</span><span class="nf">values</span><span class="p">())))</span>
+<span class="nf">graphviz_draw</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">node_attr_fn</span><span class="o">=</span><span class="n">node_attr</span><span class="p">,</span> <span class="n">graph_attr</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">rankdir</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">LR</span><span class="sh">'</span><span class="p">})</span>
+</code></pre></div></div>
+
+<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/pauli-grouping.png"><br></p>
+
+<p>This is the exact implementation of <code class="language-plaintext highlighter-rouge">PauliList.group_commuting</code> under Qiskit.</p>
 
 <h3 id="variational-quantum-eigensolver">Variational Quantum Eigensolver</h3>
 

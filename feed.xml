@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://soon-teh.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://soon-teh.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-14T21:18:28+00:00</updated><id>https://soon-teh.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://soon-teh.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://soon-teh.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-15T00:30:24+00:00</updated><id>https://soon-teh.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
 </subtitle><entry><title type="html">Introduction to rustworkx</title><link href="https://soon-teh.github.io/blog/2023/intro-to-rustworkx/" rel="alternate" type="text/html" title="Introduction to rustworkx" /><published>2023-06-07T00:00:00+00:00</published><updated>2023-06-07T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2023/intro-to-rustworkx</id><content type="html" xml:base="https://soon-teh.github.io/blog/2023/intro-to-rustworkx/"><![CDATA[<h2 id="rustworkx">rustworkx</h2>
 <p>Qiskit uses <a href="https://github.com/Qiskit/rustworkx"><strong>rustworkx</strong></a> (or formerly <strong>retworkx</strong>), a graph library under the hood. rustworkx was originally conceived to build a faster directed acyclic graph (DAG) to use as the underlying data structure for qiskit-terra’s transpiler. For instance, a Bell state circuit can be represented as a directed graph as follows:</p>
 
@@ -23,9 +23,11 @@
 
 <p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/auckland-error.png" /><br /></p>
 
-<p>The standard graph algorithms perform summation across the edges of non-negative weights. Thus, the weights, $w$ are defined as the negative log of the CNOT gate success rate:
-\(w_{ij}=-\log(1-p_{ij})\)
-where $p_{ij}$ is the CNOT gate error rate for the control qubit $i$ and target qubit $j$. Under this convention, smaller weights corresponds to higher success probability. For simplicity, the coupling map will be converted to a undirected graph because of the symmetry of the CNOT gate error rate for <code class="language-plaintext highlighter-rouge">ibm_auckland</code>. Special care taking into consideration of the gate asymmetry is needed for hardware such as the <a href="https://research.ibm.com/blog/eagle-quantum-error-mitigation">Eagle processor</a>, which utilizes uni-directional echoed cross-resonance (ECR) gates.</p>
+<p>The standard graph algorithms perform summation across the edges of non-negative weights. Thus, the weights, $w$ are defined as the negative log of the CNOT gate success rate:</p>
+
+\[w_{ij}=-\log(1-p_{ij})\]
+
+<p>where $p_{ij}$ is the CNOT gate error rate for the control qubit $i$ and target qubit $j$. Under this convention, smaller weights corresponds to higher success probability. For simplicity, the coupling map will be converted to a undirected graph because of the symmetry of the CNOT gate error rate for <code class="language-plaintext highlighter-rouge">ibm_auckland</code>. Special care taking into consideration of the gate asymmetry is needed for hardware such as the <a href="https://research.ibm.com/blog/eagle-quantum-error-mitigation">Eagle processor</a>, which utilizes uni-directional echoed cross-resonance (ECR) gates.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
 <span class="kn">import</span> <span class="n">rustworkx</span> <span class="k">as</span> <span class="n">rx</span>
@@ -68,11 +70,40 @@ where $p_{ij}$ is the CNOT gate error rate for the control qubit $i$ and target 
 <h3 id="4-color-theorem">4 Color Theorem</h3>
 
 <h3 id="pauli-grouping">Pauli Grouping</h3>
-<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/apac.png" /><br /></p>
+<p>Commuting variables can be measured simultaneously. The grouping of commuting Pauli strings is useful for measurement reduction.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">qiskit.quantum_info</span> <span class="kn">import</span> <span class="n">PauliList</span>
+<span class="n">op</span> <span class="o">=</span> <span class="nc">PauliList</span><span class="p">([</span><span class="sh">"</span><span class="s">XX</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">YY</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">IZ</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">ZZ</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">ZX</span><span class="sh">"</span><span class="p">])</span>
+</code></pre></div></div>
+
+<p>Coloring a planar graph is still a NP-hard problem, but a heuristic algorithm can be employed to obtain a good coloring. The greedy algorithm is one such algorithm that is simple and fast. The algorithm starts with an empty coloring and iteratively colors the nodes with the lowest possible color. The algorithm is guaranteed to produce a coloring that is at most one more than the optimal coloring. The algorithm is implemented in rustworkx and can be accessed via <code class="language-plaintext highlighter-rouge">graph_greedy_color</code>.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">matplotlib</span> <span class="k">as</span> <span class="n">mpl</span>
+<span class="n">cmap</span> <span class="o">=</span> <span class="n">mpl</span><span class="p">.</span><span class="n">cm</span><span class="p">.</span><span class="nf">get_cmap</span><span class="p">(</span><span class="sh">'</span><span class="s">tab10</span><span class="sh">'</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">node_attr</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+    <span class="n">rgba</span> <span class="o">=</span> <span class="n">mpl</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="nf">to_hex</span><span class="p">(</span><span class="nf">cmap</span><span class="p">(</span><span class="n">coloring_dict</span><span class="p">[</span><span class="n">node</span><span class="p">]))</span>
+    <span class="k">return</span> <span class="p">{</span><span class="sh">'</span><span class="s">label</span><span class="sh">'</span><span class="p">:</span> <span class="nf">str</span><span class="p">(</span><span class="n">op</span><span class="p">[</span><span class="n">node</span><span class="p">].</span><span class="nf">to_label</span><span class="p">()),</span> 
+            <span class="sh">'</span><span class="s">shape</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">circle</span><span class="sh">'</span><span class="p">,</span> 
+            <span class="c1"># 'color': f"\"{rgba}\"", 
+</span>            <span class="sh">'</span><span class="s">fillcolor</span><span class="sh">'</span><span class="p">:</span> <span class="sa">f</span><span class="sh">"</span><span class="se">\"</span><span class="si">{</span><span class="n">rgba</span><span class="si">}</span><span class="se">\"</span><span class="sh">"</span><span class="p">,</span> 
+            <span class="sh">'</span><span class="s">style</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">filled</span><span class="sh">'</span><span class="p">,</span>
+            <span class="sh">'</span><span class="s">width</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">0.9</span><span class="sh">'</span><span class="p">}</span>
+
+
+<span class="n">graph</span> <span class="o">=</span> <span class="n">op</span><span class="p">.</span><span class="nf">_create_graph</span><span class="p">(</span><span class="bp">False</span><span class="p">)</span>
+<span class="n">coloring_dict</span> <span class="o">=</span> <span class="n">rx</span><span class="p">.</span><span class="nf">graph_greedy_color</span><span class="p">(</span><span class="n">graph</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">len</span><span class="p">(</span><span class="nf">set</span><span class="p">(</span><span class="n">coloring_dict</span><span class="p">.</span><span class="nf">values</span><span class="p">())))</span>
+<span class="nf">graphviz_draw</span><span class="p">(</span><span class="n">graph</span><span class="p">,</span> <span class="n">node_attr_fn</span><span class="o">=</span><span class="n">node_attr</span><span class="p">,</span> <span class="n">graph_attr</span><span class="o">=</span><span class="p">{</span><span class="sh">'</span><span class="s">rankdir</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">LR</span><span class="sh">'</span><span class="p">})</span>
+</code></pre></div></div>
+
+<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/pauli-grouping.png" /><br /></p>
+
+<p>This is the exact implementation of <code class="language-plaintext highlighter-rouge">PauliList.group_commuting</code> under Qiskit.</p>
 
 <h3 id="variational-quantum-eigensolver">Variational Quantum Eigensolver</h3>
 
-<h2 id="final-remarks">Final Remarks</h2>]]></content><author><name>Soon Teh</name></author><category term="qiskit" /><category term="rustworkx" /><summary type="html"><![CDATA[With examples on IBM quantum devices]]></summary></entry><entry><title type="html">Generating GHZ state on IBM device</title><link href="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/" rel="alternate" type="text/html" title="Generating GHZ state on IBM device" /><published>2023-05-30T00:00:00+00:00</published><updated>2023-05-30T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz</id><content type="html" xml:base="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/"><![CDATA[<h2 id="ibm-quantum-spring-challenge-2023">IBM Quantum Spring Challenge 2023</h2>
+<h2 id="final-remarks">Final Remarks</h2>]]></content><author><name>Soon Teh</name></author><category term="qiskit" /><category term="rustworkx" /><summary type="html"><![CDATA[With examples and applications in quantum computing]]></summary></entry><entry><title type="html">Generating GHZ state on IBM device</title><link href="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/" rel="alternate" type="text/html" title="Generating GHZ state on IBM device" /><published>2023-05-30T00:00:00+00:00</published><updated>2023-05-30T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz</id><content type="html" xml:base="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/"><![CDATA[<h2 id="ibm-quantum-spring-challenge-2023">IBM Quantum Spring Challenge 2023</h2>
 <p><a href="https://research.ibm.com/blog/quantum-challenge-spring-2023">IBM Quantum Spring Challenge</a> was a public event held from May 17 to May 24. This challenge is part of IBM Quantum’s ongoing global education efforts and is free to participate in. The challenge’s goal is to provide participants with a deeper understanding of a specific quantum topic.</p>
 
 <p>This year’s challenge marked the third anniversary of the IBM Quantum Challenge since May 2020. The challenge focuses on <a href="https://quantum-computing.ibm.com/services/programs/docs/runtime/manage/systems/dynamic-circuits/Introduction-To-Dynamic-Circuits">dynamic circuits</a>, which allow for classical processing during the runtime of the circuit. The dynamic circuits were implemented in the challenge to demonstrate error mitigation and quantum teleportation. Participants also have the opportunity to run their program on a 127-qubit device.</p>
