@@ -173,8 +173,21 @@
           <h3>Contents</h3>
             <div><a href="#rustworkx">rustworkx</a></div>
             <div><a href="#ibm-hardware-coupling-map">IBM Hardware Coupling Map</a></div>
-            <div><a href="#map-coloring-efficient-measurement-and-chemical-structure">Map Coloring, Efficient Measurement and Chemical Structure</a></div>
-            <div><a href="#final-remarks">Final Remarks</a></div>
+            <ul>
+              <li><a href="#visualization">Visualization</a></li>
+              <li><a href="#centrality">Centrality</a></li>
+              <li><a href="#transversal">Transversal</a></li>
+              <li><a href="#mean-spanning-tree">Mean Spanning Tree</a></li>
+              
+            </ul>
+<div><a href="#map-coloring-efficient-measurement-and-chemical-structure">Map Coloring, Efficient Measurement and Chemical Structure</a></div>
+            <ul>
+              <li><a href="#4-color-theorem">4 Color Theorem</a></li>
+              <li><a href="#pauli-grouping">Pauli Grouping</a></li>
+              <li><a href="#variational-quantum-eigensolver">Variational Quantum Eigensolver</a></li>
+              
+            </ul>
+<div><a href="#final-remarks">Final Remarks</a></div>
             
           </nav>
         </d-contents>
@@ -192,7 +205,6 @@
 <p>This section will use IBM’s hardware coupling map as an example to demonstrate some of rustworkx’s features. The coupling map is a graph that represents the connectivity of the qubits in a quantum device. First, the coupling map is loaded from IBM’s hardware backend:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">qiskit.providers.fake_provider</span> <span class="kn">import</span> <span class="n">FakeAuckland</span>
-<span class="kn">from</span> <span class="n">qiskit.visualization</span> <span class="kn">import</span> <span class="n">plot_gate_map</span><span class="p">,</span> <span class="n">plot_error_map</span>
 
 <span class="n">backend</span> <span class="o">=</span> <span class="nc">FakeAuckland</span><span class="p">()</span>
 <span class="n">backend</span><span class="p">.</span><span class="n">coupling_map</span><span class="p">.</span><span class="nf">draw</span><span class="p">()</span>
@@ -212,42 +224,123 @@
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">numpy</span> <span class="k">as</span> <span class="n">np</span>
 <span class="kn">import</span> <span class="n">rustworkx</span> <span class="k">as</span> <span class="n">rx</span>
 
-<span class="n">two_q_error_map</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="c1"># extract the two-qubit error rate from the backend
+</span><span class="n">two_q_error_map</span> <span class="o">=</span> <span class="p">{}</span>
 <span class="k">for</span> <span class="n">gate</span><span class="p">,</span> <span class="n">prop_dict</span> <span class="ow">in</span> <span class="n">backend</span><span class="p">.</span><span class="n">target</span><span class="p">.</span><span class="nf">items</span><span class="p">():</span>
-    <span class="k">if</span> <span class="n">prop_dict</span> <span class="ow">is</span> <span class="bp">None</span> <span class="ow">or</span> <span class="bp">None</span> <span class="ow">in</span> <span class="n">prop_dict</span><span class="p">:</span>
-        <span class="k">continue</span>
     <span class="k">for</span> <span class="n">qargs</span><span class="p">,</span> <span class="n">inst_props</span> <span class="ow">in</span> <span class="n">prop_dict</span><span class="p">.</span><span class="nf">items</span><span class="p">():</span>
-        <span class="k">if</span> <span class="n">inst_props</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
-            <span class="k">continue</span>
         <span class="k">if</span> <span class="nf">len</span><span class="p">(</span><span class="n">qargs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">inst_props</span><span class="p">.</span><span class="n">error</span> <span class="ow">is</span> <span class="ow">not</span> <span class="bp">None</span><span class="p">:</span>
                 <span class="n">two_q_error_map</span><span class="p">[</span><span class="n">qargs</span><span class="p">]</span> <span class="o">=</span> <span class="nf">max</span><span class="p">(</span>
                     <span class="n">two_q_error_map</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="n">qargs</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span> <span class="n">inst_props</span><span class="p">.</span><span class="n">error</span>
                 <span class="p">)</span>
 
-<span class="c1"># using negative log success probability as weight
-# log allows the product of success rate to be treated as simple sum as per the conventional graph treatment
+<span class="c1"># convert two-qubit error rate to edge weight
 </span><span class="n">two_q_suc</span> <span class="o">=</span> <span class="mi">1</span><span class="o">-</span><span class="n">np</span><span class="p">.</span><span class="nf">array</span><span class="p">(</span><span class="nf">list</span><span class="p">(</span><span class="n">two_q_error_map</span><span class="p">.</span><span class="nf">values</span><span class="p">()))</span>
 <span class="n">neg_log_two_q_suc_val</span> <span class="o">=</span> <span class="o">-</span><span class="n">np</span><span class="p">.</span><span class="nf">log</span><span class="p">(</span><span class="n">two_q_suc</span><span class="p">)</span>
 <span class="n">neg_log_two_q_suc</span> <span class="o">=</span> <span class="nf">dict</span><span class="p">(</span><span class="nf">zip</span><span class="p">(</span><span class="n">two_q_error_map</span><span class="p">.</span><span class="nf">keys</span><span class="p">(),</span> <span class="n">neg_log_two_q_suc_val</span><span class="p">))</span>
 
-<span class="n">g</span> <span class="o">=</span> <span class="n">rx</span><span class="p">.</span><span class="nc">PyGraph</span><span class="p">()</span>
+<span class="c1"># create undirected graph
+</span><span class="n">g</span> <span class="o">=</span> <span class="n">rx</span><span class="p">.</span><span class="nc">PyGraph</span><span class="p">(</span><span class="n">multigraph</span><span class="o">=</span><span class="bp">False</span><span class="p">)</span>
 <span class="n">g</span><span class="p">.</span><span class="nf">extend_from_weighted_edge_list</span><span class="p">([(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="nf">for </span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">),</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">neg_log_two_q_suc</span><span class="p">.</span><span class="nf">items</span><span class="p">()])</span>
 </code></pre></div></div>
 
-<p>An empty undirected graph <code class="language-plaintext highlighter-rouge">PyGraph</code> object was first created and populated with the weighted edges using <code class="language-plaintext highlighter-rouge">extend_from_weighted_edge_list</code>. This method will create the nodes and edges if they do not exist.</p>
+<p>An empty undirected graph <code class="language-plaintext highlighter-rouge">PyGraph</code> object was first created and populated with the weighted edges using <code class="language-plaintext highlighter-rouge">extend_from_weighted_edge_list</code>. This method will create the nodes and edges if they do not exist. The <code class="language-plaintext highlighter-rouge">multigraph=False</code> argument ensures that the undirected graph has no parallel edges.</p>
 
-<h3 id="centrality">Centrality</h3>
+<h3 id="visualization">Visualization</h3>
+<p>Similar to NetworkX and other popular graph packages, the generated graphs can be visualized using Matplotlib. Under rustworkx, this is done using the <code class="language-plaintext highlighter-rouge">mpl_draw</code> function.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">rustworkx.visualization</span> <span class="kn">import</span> <span class="n">graphviz_draw</span><span class="p">,</span> <span class="n">mpl_draw</span>
+
+<span class="nf">mpl_draw</span><span class="p">(</span><span class="n">g</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/mpl.png"><br></p>
+
+<p>As readers may noticed, using Matplotlib to visualize complex graphs can be quite cluttered. Instead, using an alternative method <code class="language-plaintext highlighter-rouge">graphviz_draw</code> with Graphviz to render the graph can improve the clarity and visibility of the components. <a href="https://graphviz.org" rel="external nofollow noopener" target="_blank">Graphviz</a> is a dedicated graph visualization software that supports detailed customization of graph styling.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="nf">graphviz_draw</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="sh">'</span><span class="s">neato</span><span class="sh">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/neato.png"><br></p>
+
+<h3 id="betweenness-centrality">Betweenness Centrality</h3>
+<p>Given the coupling map graph, it may be helpful to identify a vital node (qubit) in the graph. Centralities are measures of the relative importance of a node in a graph. One such measure is the betweenness centrality, where for each node $v$ is metric is proportional to the number of shortest paths between all pairs of nodes $\sigma(s,t)$ that pass through $v$:</p>
+
+\[c_B(v)=\sum_{s,t\isin V}\frac{\sigma(s,t|v)}{\sigma(s,t)}\]
+
+<p>This is available in rustworkx 0.13.0 as <code class="language-plaintext highlighter-rouge">betweenness_centrality</code> for only unweighted graph:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">matplotlib</span>
+
+<span class="c1"># Assigning data payload to color nodes with graphviz_draw
+</span><span class="k">for</span> <span class="n">node_id</span><span class="p">,</span> <span class="n">btw</span> <span class="ow">in</span> <span class="n">c_degree</span><span class="p">.</span><span class="nf">items</span><span class="p">():</span>
+    <span class="n">g</span><span class="p">[</span><span class="n">node_id</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">node_id</span><span class="p">,</span> <span class="n">btw</span><span class="p">)</span>
+
+<span class="c1"># Leverage matplotlib for color map
+</span><span class="n">colormap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="p">.</span><span class="n">colormaps</span><span class="p">[</span><span class="sh">"</span><span class="s">magma</span><span class="sh">"</span><span class="p">]</span>
+<span class="n">norm</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="nc">Normalize</span><span class="p">(</span>
+    <span class="n">vmin</span><span class="o">=</span><span class="nf">min</span><span class="p">(</span><span class="n">c_degree</span><span class="p">.</span><span class="nf">values</span><span class="p">()),</span>
+    <span class="n">vmax</span><span class="o">=</span><span class="nf">max</span><span class="p">(</span><span class="n">c_degree</span><span class="p">.</span><span class="nf">values</span><span class="p">())</span><span class="o">*</span><span class="mf">1.2</span>
+<span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">color_node</span><span class="p">(</span><span class="n">node</span><span class="p">):</span>
+    <span class="n">node_id</span><span class="p">,</span> <span class="n">btw</span> <span class="o">=</span> <span class="n">node</span>
+    <span class="n">rgba</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="nf">to_hex</span><span class="p">(</span><span class="nf">colormap</span><span class="p">(</span><span class="nf">norm</span><span class="p">(</span><span class="n">btw</span><span class="p">)),</span> <span class="n">keep_alpha</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="sh">"</span><span class="s">color</span><span class="sh">"</span><span class="p">:</span> <span class="sa">f</span><span class="sh">"</span><span class="se">\"</span><span class="si">{</span><span class="n">rgba</span><span class="si">}</span><span class="se">\"</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">fillcolor</span><span class="sh">"</span><span class="p">:</span> <span class="sa">f</span><span class="sh">"</span><span class="se">\"</span><span class="si">{</span><span class="n">rgba</span><span class="si">}</span><span class="se">\"</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">style</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">filled</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">fontcolor</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">white</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">fontsize</span><span class="sh">"</span><span class="p">:</span> <span class="sh">"</span><span class="s">10.5</span><span class="sh">"</span><span class="p">,</span>
+        <span class="sh">"</span><span class="s">label</span><span class="sh">"</span><span class="p">:</span> <span class="sa">f</span><span class="sh">"</span><span class="si">{</span><span class="n">node_id</span><span class="si">}</span><span class="se">\n</span><span class="s">(</span><span class="si">{</span><span class="n">btw</span><span class="si">:</span><span class="p">.</span><span class="mi">2</span><span class="n">f</span><span class="si">}</span><span class="s">)</span><span class="sh">"</span><span class="p">,</span>
+    <span class="p">}</span>
+
+<span class="nf">graphviz_draw</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">node_attr_fn</span><span class="o">=</span><span class="n">color_node</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="sh">"</span><span class="s">neato</span><span class="sh">"</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/betweenness.png"><br></p>
+
+<p>In an unweighted scenario, it appears that the nodes 12 and 14 are nodes with the highest betweeness centrality. What would happened if the weight (CNOT error rates) are taken into account?</p>
+
+<h3 id="distance-matrix">Distance Matrix</h3>
+<p>To investigate the effect of weighted graoh, the weighted variation of betweenness centrality is needed.<d-cite key="Brandes2008Varia-5940"></d-cite> Instead of implementing the the algorithm, one can look into a different but simpler metrics - distance matrix to evaluate the quality of a node. In this case, the distance matrix is a two-dimensional symmetric square matrix where the elements, $x_ij$ is the shortest path length betweeen the node $i$ and $j$. This is conveniently available in rustworkx as <code class="language-plaintext highlighter-rouge">floyd_warshall_numpy</code>:</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">import</span> <span class="n">matplotlib.pyplot</span> <span class="k">as</span> <span class="n">plt</span>
+
+<span class="n">distance_matrix</span> <span class="o">=</span> <span class="n">rx</span><span class="p">.</span><span class="nf">floyd_warshall_numpy</span><span class="p">(</span><span class="n">g</span><span class="p">,</span> <span class="n">weight_fn</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="nf">xlabel</span><span class="p">(</span><span class="sh">'</span><span class="s">Node 1</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">ylabel</span><span class="p">(</span><span class="sh">'</span><span class="s">Node 2</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">title</span><span class="p">(</span><span class="sh">'</span><span class="s">Distance matrix</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">imshow</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">colorbar</span><span class="p">()</span>
+</code></pre></div></div>
+
+<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/distance.png"><br></p>
+
+<p>Physically, the values of each elements represent the upper bound of the success probability of CNOT entangling operation between a pair of qubits.<d-footnote>This is expressed as a sequence of CNOT gate acting across the qubits that connects the pair of qubits which gives the highest success probability.</d-footnote><d-footnote>In actual experiment, qubit decoherence resulted in lowered fidelity of the prepared state.</d-footnote> Ideally, the value should be unity. Therefore, a good central qubit should be the one with the highest success probability.</p>
+
+<div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">avg_success</span> <span class="o">=</span> <span class="n">np</span><span class="p">.</span><span class="nf">mean</span><span class="p">(</span><span class="n">np</span><span class="p">.</span><span class="nf">exp</span><span class="p">(</span><span class="o">-</span><span class="n">distance_matrix</span><span class="p">),</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">plot</span><span class="p">(</span><span class="n">avg_success</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="p">.</span><span class="nf">xlabel</span><span class="p">(</span><span class="sh">'</span><span class="s">Node</span><span class="sh">'</span><span class="p">)</span>
+<span class="n">plt</span><span class="p">.</span><span class="nf">ylabel</span><span class="p">(</span><span class="sh">'</span><span class="s">Average Success CNOT Entangling Probability</span><span class="sh">'</span><span class="p">)</span>
+</code></pre></div></div>
+
+<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/avg_success.png"><br></p>
+
+<p>When taken into account the edge weight, the poor CNOT performance of node 15 manifests and its surrounding nodes  exhibit poorer average success probability.</p>
 
 <h3 id="transversal">Transversal</h3>
-
-<h3 id="mean-spanning-tree">Mean Spanning Tree</h3>
+<p>The implementation of the transversal algorithm consists of two parts: the <em>search algorithm</em> and the <em>visitor object</em>.</p>
 
 <h2 id="map-coloring-efficient-measurement-and-chemical-structure">Map Coloring, Efficient Measurement and Chemical Structure</h2>
 
-<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/apac.png"><br></p>
+<p>What do map coloring, efficient measurement and chemical structure have in common? It turns out that efficiently evaluating a chemical structure’s electronic wavefunction and energy can be traced back to the problem of map coloring. This section will explore the connection between these three topics and how rustworkx was used within the Qiskit codebase.</p>
 
 <h3 id="4-color-theorem">4 Color Theorem</h3>
+
+<p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/apac.png"><br></p>
 
 <h3 id="pauli-grouping">Pauli Grouping</h3>
 <p>Commuting variables can be measured simultaneously. The grouping of commuting Pauli strings is useful for measurement reduction.</p>
@@ -265,8 +358,7 @@
     <span class="n">rgba</span> <span class="o">=</span> <span class="n">mpl</span><span class="p">.</span><span class="n">colors</span><span class="p">.</span><span class="nf">to_hex</span><span class="p">(</span><span class="nf">cmap</span><span class="p">(</span><span class="n">coloring_dict</span><span class="p">[</span><span class="n">node</span><span class="p">]))</span>
     <span class="k">return</span> <span class="p">{</span><span class="sh">'</span><span class="s">label</span><span class="sh">'</span><span class="p">:</span> <span class="nf">str</span><span class="p">(</span><span class="n">op</span><span class="p">[</span><span class="n">node</span><span class="p">].</span><span class="nf">to_label</span><span class="p">()),</span> 
             <span class="sh">'</span><span class="s">shape</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">circle</span><span class="sh">'</span><span class="p">,</span> 
-            <span class="c1"># 'color': f"\"{rgba}\"", 
-</span>            <span class="sh">'</span><span class="s">fillcolor</span><span class="sh">'</span><span class="p">:</span> <span class="sa">f</span><span class="sh">"</span><span class="se">\"</span><span class="si">{</span><span class="n">rgba</span><span class="si">}</span><span class="se">\"</span><span class="sh">"</span><span class="p">,</span> 
+            <span class="sh">'</span><span class="s">fillcolor</span><span class="sh">'</span><span class="p">:</span> <span class="sa">f</span><span class="sh">"</span><span class="se">\"</span><span class="si">{</span><span class="n">rgba</span><span class="si">}</span><span class="se">\"</span><span class="sh">"</span><span class="p">,</span> 
             <span class="sh">'</span><span class="s">style</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">filled</span><span class="sh">'</span><span class="p">,</span>
             <span class="sh">'</span><span class="s">width</span><span class="sh">'</span><span class="p">:</span> <span class="sh">'</span><span class="s">0.9</span><span class="sh">'</span><span class="p">}</span>
 
