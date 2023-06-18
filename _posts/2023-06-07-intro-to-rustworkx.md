@@ -18,12 +18,13 @@ bibliography: 2023-06-07.bib
 toc:
   - name: rustworkx
   - name: IBM Hardware Coupling Map
-    sections:
+    subsections:
+    - name: Visualization
     - name: Centrality
     - name: Transversal
     - name: Mean Spanning Tree
   - name: Map Coloring, Efficient Measurement and Chemical Structure
-    sections:
+    subsections:
     - name: 4 Color Theorem
     - name: Pauli Grouping
     - name: Variational Quantum Eigensolver
@@ -50,7 +51,6 @@ This section will use IBM's hardware coupling map as an example to demonstrate s
 
 ```python
 from qiskit.providers.fake_provider import FakeAuckland
-from qiskit.visualization import plot_gate_map, plot_error_map
 
 backend = FakeAuckland()
 backend.coupling_map.draw()
@@ -73,44 +73,133 @@ where $p_{ij}$ is the CNOT gate error rate for the control qubit $i$ and target 
 import numpy as np
 import rustworkx as rx
 
+# extract the two-qubit error rate from the backend
 two_q_error_map = {}
 for gate, prop_dict in backend.target.items():
-    if prop_dict is None or None in prop_dict:
-        continue
     for qargs, inst_props in prop_dict.items():
-        if inst_props is None:
-            continue
         if len(qargs) == 2:
             if inst_props.error is not None:
                 two_q_error_map[qargs] = max(
                     two_q_error_map.get(qargs, 0), inst_props.error
                 )
 
-# using negative log success probability as weight
-# log allows the product of success rate to be treated as simple sum as per the conventional graph treatment
+# convert two-qubit error rate to edge weight
 two_q_suc = 1-np.array(list(two_q_error_map.values()))
 neg_log_two_q_suc_val = -np.log(two_q_suc)
 neg_log_two_q_suc = dict(zip(two_q_error_map.keys(), neg_log_two_q_suc_val))
 
-g = rx.PyGraph()
+# create undirected graph
+g = rx.PyGraph(multigraph=False)
 g.extend_from_weighted_edge_list([(x, y, v) for (x, y), v in neg_log_two_q_suc.items()])
 ```
 
-An empty undirected graph `PyGraph` object was first created and populated with the weighted edges using `extend_from_weighted_edge_list`. This method will create the nodes and edges if they do not exist.
+An empty undirected graph `PyGraph` object was first created and populated with the weighted edges using `extend_from_weighted_edge_list`. This method will create the nodes and edges if they do not exist. The `multigraph=False` argument ensures that the undirected graph has no parallel edges.
 
-### Centrality
+### Visualization
+Similar to NetworkX and other popular graph packages, the generated graphs can be visualized using Matplotlib. Under rustworkx, this is done using the `mpl_draw` function.
 
+```python
+from rustworkx.visualization import graphviz_draw, mpl_draw
+
+mpl_draw(g)
+```
+
+<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/mpl.png"><br>
+
+As readers may noticed, using Matplotlib to visualize complex graphs can be quite cluttered. Instead, using an alternative method `graphviz_draw` with Graphviz to render the graph can improve the clarity and visibility of the components. [Graphviz](https://graphviz.org) is a dedicated graph visualization software that supports detailed customization of graph styling.
+
+```python
+graphviz_draw(g, method='neato')
+```
+
+<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/neato.png"><br>
+
+
+### Betweenness Centrality
+Given the coupling map graph, it may be helpful to identify a vital node (qubit) in the graph. Centralities are measures of the relative importance of a node in a graph. One such measure is the betweenness centrality, where for each node $v$ is metric is proportional to the number of shortest paths between all pairs of nodes $\sigma(s,t)$ that pass through $v$:
+
+$$
+c_B(v)=\sum_{s,t\isin V}\frac{\sigma(s,t|v)}{\sigma(s,t)}
+$$
+
+This is available in rustworkx 0.13.0 as `betweenness_centrality` for only unweighted graph:
+
+```python
+import matplotlib
+
+# Assigning data payload to color nodes with graphviz_draw
+for node_id, btw in c_degree.items():
+    g[node_id] = (node_id, btw)
+
+# Leverage matplotlib for color map
+colormap = matplotlib.colormaps["magma"]
+norm = matplotlib.colors.Normalize(
+    vmin=min(c_degree.values()),
+    vmax=max(c_degree.values())*1.2
+)
+
+def color_node(node):
+    node_id, btw = node
+    rgba = matplotlib.colors.to_hex(colormap(norm(btw)), keep_alpha=True)
+    return {
+        "color": f"\"{rgba}\"",
+        "fillcolor": f"\"{rgba}\"",
+        "style": "filled",
+        "fontcolor": "white",
+        "fontsize": "10.5",
+        "label": f"{node_id}\n({btw:.2f})",
+    }
+
+graphviz_draw(g, node_attr_fn=color_node, method="neato")
+```
+
+<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/betweenness.png"><br>
+
+In an unweighted scenario, it appears that the nodes 12 and 14 are nodes with the highest betweeness centrality. What would happened if the weight (CNOT error rates) are taken into account? 
+
+### Distance Matrix
+To investigate the effect of weighted graoh, the weighted variation of betweenness centrality is needed.<d-cite key="Brandes2008Varia-5940"></d-cite> Instead of implementing the the algorithm, one can look into a different but simpler metrics - distance matrix to evaluate the quality of a node. In this case, the distance matrix is a two-dimensional symmetric square matrix where the elements, $x_ij$ is the shortest path length betweeen the node $i$ and $j$. This is conveniently available in rustworkx as `floyd_warshall_numpy`:
+
+```python
+import matplotlib.pyplot as plt
+
+distance_matrix = rx.floyd_warshall_numpy(g, weight_fn=float)
+
+plt.xlabel('Node 1')
+plt.ylabel('Node 2')
+plt.title('Distance matrix')
+plt.imshow(distance_matrix)
+plt.colorbar()
+```
+
+<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/distance.png"><br>
+
+Physically, the values of each elements represent the upper bound of the success probability of CNOT entangling operation between a pair of qubits.<d-footnote>This is expressed as a sequence of CNOT gate acting across the qubits that connects the pair of qubits which gives the highest success probability.</d-footnote><d-footnote>In actual experiment, qubit decoherence resulted in lowered fidelity of the prepared state.</d-footnote> Ideally, the value should be unity. Therefore, a good central qubit should be the one with the highest success probability.
+
+```python
+avg_success = np.mean(np.exp(-distance_matrix), axis=1)
+plt.plot(avg_success)
+
+plt.xlabel('Node')
+plt.ylabel('Average Success CNOT Entangling Probability')
+```
+
+<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/avg_success.png"><br>
+
+When taken into account the edge weight, the poor CNOT performance of node 15 manifests and its surrounding nodes  exhibit poorer average success probability.
 
 
 ### Transversal
-
-### Mean Spanning Tree
+The implementation of the transversal algorithm consists of two parts: the _search algorithm_ and the _visitor object_.
 
 ## Map Coloring, Efficient Measurement and Chemical Structure
 
-<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/apac.png"><br>
+What do map coloring, efficient measurement and chemical structure have in common? It turns out that efficiently evaluating a chemical structure's electronic wavefunction and energy can be traced back to the problem of map coloring. This section will explore the connection between these three topics and how rustworkx was used within the Qiskit codebase.
+
 
 ### 4 Color Theorem
+
+<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/apac.png"><br>
 
 ### Pauli Grouping
 Commuting variables can be measured simultaneously. The grouping of commuting Pauli strings is useful for measurement reduction.
@@ -130,7 +219,6 @@ def node_attr(node):
     rgba = mpl.colors.to_hex(cmap(coloring_dict[node]))
     return {'label': str(op[node].to_label()), 
             'shape': 'circle', 
-            # 'color': f"\"{rgba}\"", 
             'fillcolor': f"\"{rgba}\"", 
             'style': 'filled',
             'width': '0.9'}
