@@ -194,7 +194,7 @@ The implementation of the transversal algorithm consists of two parts: the _sear
 - `bfs_search` / `BFSVisitor`
 - `dijkstra_search` / `DijkstraVisitor`
 
-The transversal algorithm of interest for the weighted graph is the Dijkstra's algorithm. The Dijkstra's algorithm is a single-source shortest path algorithm that is applicable to both weighted and unweighted graphs. The pseudo-code for the `dijkstra_search` algorithm is as follows, which consists of several event points. The visitor object implements the callback functions that are invoked at [each event point as defined by the pseudo-code](https://qiskit.org/documentation/retworkx/apiref/rustworkx.dijkstra_search.html#rustworkx.dijkstra_search). In particular, the event of interest is the `edge_relaxed` which is triggered when a shorter path is discovered. With that in mind, a visitor object that records the edges of a shortest path tree with root from the central qubit can be implemented as follows:
+The transversal algorithm of interest for the weighted graph is Dijkstra's algorithm. The Dijkstra's algorithm is a single-source shortest-path algorithm that is applicable to both weighted and unweighted graphs. The pseudo-code for the `dijkstra_search` algorithm is as follows, which consists of several event points. The visitor object implements the callback functions that are invoked at [each event point as defined by the pseudo-code](https://qiskit.org/documentation/retworkx/apiref/rustworkx.dijkstra_search.html#rustworkx.dijkstra_search). In particular, the event of interest is the `edge_relaxed` which is triggered when a shorter path is discovered. With that in mind, a visitor object that records the edges of the shortest path tree with root from the central qubit can be implemented as follows:
 
  ```python
  class TreeEdgesRecorder(rx.visit.DijkstraVisitor):
@@ -224,20 +224,20 @@ graphviz_draw(t, method='dot', node_attr_fn=color_node, graph_attr={'rankdir': '
 
 <img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/dijkstra.png"><br>
 
-The tree obtained from the central root node provides a heuristic approach to hardware-aware mapping of quantum circuits for a whole device entanglement or state preparation (for instance, quantum circuit decomposition of a center-gauge matrix product state).<d-cite key=dborin2021matrix></d-cite> This technique attempt to minimize the distance between the furthest qubits and the CNOT gate error rate. This concludes the brief demonstration of rustworkx graph library and its application to quantum computing.
+The tree obtained from the central root node provides a heuristic approach to hardware-aware mapping of quantum circuits for a whole device entanglement or state preparation (for instance, quantum circuit decomposition of a center-gauge matrix product state).<d-cite key=dborin2021matrix></d-cite> This technique attempt to minimize the distance between the furthest qubits and the CNOT gate error rate. This concludes the brief demonstration using the hardware coupling map.
 
 
 ## Map Coloring and Efficient Quantum Measurement
-How can methods for coloring a map lead to a speedup in quant?um algorithm such as variational quantum eigensolver (VQE)? This section will explore the connection between these topics and how rustworkx was used within the Qiskit codebase.
+How can methods for coloring a map lead to a speedup in quantum algorithms such as variational quantum eigensolver (VQE)? This section will explore the connection between these topics and how rustworkx was used within the Qiskit codebase.
 
 
 ### Four-Color Theorem
 
 In the October of 1852, Francis Guthrie who was a student in London noticed that only four colors are needed to color the map of the counties of England in such a way that no two countries sharing a common border receive the same color. This then started a chain of letters which sees the birth of the four-color conjecture.
 
-Early proofs of the theorem by Alfred Kempe in 1879 and Peter Guthrie Tait in 1880 turn out to be fallacious after eleven years. Eventually, the first correct proof was published in 1976 by Kenneth Appel and Wolfgang Haken. The proof was controversial as it was the first major theorem to be proved using a computer. The proof was not accepted by the mathematical community until 1997 when it was verified by other mathematicians. 
+Early proofs of the theorem by Alfred Kempe in 1879 and Peter Guthrie Tait in 1880 turn out to be both fallacious after eleven years each. Eventually, the first correct proof was published in 1976 by Kenneth Appel and Wolfgang Haken. The proof was controversial as it was the first major theorem to be proved using a computer.
 
-Each region or country on a map can be represented by a node. Two nodes are connected by an edge if the corresponding regions share a common border. Thus, the map coloring is reduced to a planar graph coloring problem. Planar graph is a graph that can be embedded in a plane without any edges crossing. For general graph coloring problem, more colors are needed. 
+On any given map, each region or country on a map can be represented by a node. Two nodes are connected by an edge if the corresponding regions share a common border. Thus, the map coloring is reduced to a planar graph coloring problem. A planar graph is a graph that can be embedded in a plane without any edges crossing. For general graph coloring problems, more colors are needed. 
 
 <img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/apac.png"><br>
 
