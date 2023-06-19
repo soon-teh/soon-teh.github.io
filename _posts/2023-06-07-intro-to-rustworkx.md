@@ -23,11 +23,10 @@ toc:
     - name: Betweenness Centrality
     - name: Distance Matrix
     - name: Transversal
-  - name: Map Coloring, Efficient Measurement and Chemical Structure
+  - name: Map Coloring and Efficient Quantum Measurement
     subsections:
-    - name: 4 Color Theorem
+    - name: Four-Color Theorem
     - name: Pauli Grouping
-    - name: Variational Quantum Eigensolver
   - name: Final Remarks
 
 _styles: >
@@ -229,16 +228,25 @@ The tree obtained from the central root node provides a heuristic approach to ha
 
 
 ## Map Coloring and Efficient Quantum Measurement
+How can methods for coloring a map lead to a speedup in quant?um algorithm such as variational quantum eigensolver (VQE)? This section will explore the connection between these topics and how rustworkx was used within the Qiskit codebase.
 
-What do map coloring, efficient measurement and chemical structure have in common? It turns out that efficiently evaluating a chemical structure's electronic wavefunction and energy can be traced back to the problem of map coloring. This section will explore the connection between these three topics and how rustworkx was used within the Qiskit codebase.
 
+### Four-Color Theorem
 
-### 4 Color Theorem
+In the October of 1852, Francis Guthrie who was a student in London noticed that only four colors are needed to color the map of the counties of England in such a way that no two countries sharing a common border receive the same color. This then started a chain of letters which sees the birth of the four-color conjecture.
+
+Early proofs of the theorem by Alfred Kempe in 1879 and Peter Guthrie Tait in 1880 turn out to be fallacious after eleven years. Eventually, the first correct proof was published in 1976 by Kenneth Appel and Wolfgang Haken. The proof was controversial as it was the first major theorem to be proved using a computer. The proof was not accepted by the mathematical community until 1997 when it was verified by other mathematicians. 
+
+Each region or country on a map can be represented by a node. Two nodes are connected by an edge if the corresponding regions share a common border. Thus, the map coloring is reduced to a planar graph coloring problem. Planar graph is a graph that can be embedded in a plane without any edges crossing. For general graph coloring problem, more colors are needed. 
 
 <img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/apac.png"><br>
 
+Enjoy a colored map of the Asia-Pacific!
+
 ### Pauli Grouping
-Commuting variables can be measured simultaneously. The grouping of commuting Pauli strings is useful for measurement reduction.
+VQE is a hybrid quantum-classical algorithm designed to find the ground state or energy spectrum of a physical or chemical system. However, obtaining the expectation value of a Hamiltonian requires decomposition into a weighted sum of Pauli string. Each Pauli string needs to be sampled sufficiently many times to obtain a good estimate of the expectation value. Thus, the ability to simultaneously measure commuting Pauli strings, i.e. Pauli grouping is crucial to the performance of VQE.
+
+Starting from a set of Pauli strings `["XX", "YY", "IZ", "ZZ", "ZX"]`, the goal is to group the Pauli strings into commuting sets. The algorithm first constructs a graph where the presence of an edge between two nodes indicates their non-commutativity. The graph is then colored such that no two adjacent nodes have the same color. The coloring of the graph then determines the grouping of the Pauli strings.
 
 ```python
 from qiskit.quantum_info import PauliList
@@ -246,7 +254,7 @@ from qiskit.quantum_info import PauliList
 op = PauliList(["XX", "YY", "IZ", "ZZ", "ZX"])
 ```
 
-Coloring a planar graph is still a NP-hard problem, but a heuristic algorithm can be employed to obtain a good coloring. The greedy algorithm is one such algorithm that is simple and fast. The algorithm starts with an empty coloring and iteratively colors the nodes with the lowest possible color. The algorithm is guaranteed to produce a coloring that is at most one more than the optimal coloring. The algorithm is implemented in rustworkx and can be accessed via `graph_greedy_color`. 
+Coloring a graph is still an NP-hard problem, but a heuristic algorithm can be employed to obtain good coloring. The greedy algorithm is one such algorithm that is simple and fast. The algorithm starts with an empty coloring and iteratively colors the nodes with the lowest possible color. The algorithm is guaranteed to produce a coloring that is at most one more than the optimal coloring. The algorithm is implemented in rustworkx and can be accessed via `graph_greedy_color`. 
 
 ```python
 cmap = matplotlib.cm.get_cmap('tab10')
@@ -267,6 +275,6 @@ graphviz_draw(graph, node_attr_fn=node_attr, graph_attr={'rankdir': 'LR'})
 
 <img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/pauli-grouping.png"><br>
 
-This is the exact implementation of `PauliList.group_commuting` under Qiskit.
+This is the exact implementation of `PauliList.group_commuting` under Qiskit. Now, instead of 5 measurements, only 3 measurements are needed to sample all the Pauli strings once. This is a 40% reduction in the number of measurements, demonstrating the importance of Pauli grouping in VQE.
 
 ## Final Remarks
