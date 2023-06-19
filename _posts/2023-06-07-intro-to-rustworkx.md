@@ -20,9 +20,9 @@ toc:
   - name: IBM Hardware Coupling Map
     subsections:
     - name: Visualization
-    - name: Centrality
+    - name: Betweenness Centrality
+    - name: Distance Matrix
     - name: Transversal
-    - name: Mean Spanning Tree
   - name: Map Coloring, Efficient Measurement and Chemical Structure
     subsections:
     - name: 4 Color Theorem
@@ -119,7 +119,7 @@ graphviz_draw(g, method='neato')
 Given the coupling map graph, it may be helpful to identify a vital node (qubit) in the graph. Centralities are measures of the relative importance of a node in a graph. One such measure is the betweenness centrality, where for each node $v$ is metric is proportional to the number of shortest paths between all pairs of nodes $\sigma(s,t)$ that passes through $v$:
 
 $$
-c_B(v)=\sum_{s,t \isin V}\frac{\sigma(s,t|v)}{\sigma(s,t)}
+c_B(v)=\sum_{s,t \in V}\frac{\sigma(s,t|v)}{\sigma(s,t)}
 $$
 
 This is available in rustworkx 0.13.0 as `betweenness_centrality` for only unweighted graph:
@@ -174,7 +174,7 @@ plt.colorbar()
 
 <img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/distance.png"><br>
 
-Physically, the values of each element represent the upper bound of the success probability of CNOT entangling operation between a pair of qubits.<d-footnote> This is expressed as a sequence of CNOT gates acting across the qubits that connect the pair of qubits which gives the highest success probability. In an actual experiment, qubit decoherence resulted in lowered fidelity of the prepared state.</d-footnote> Ideally, the value should be unity. Therefore, a good central qubit should be the one with the highest success probability.
+Physically, the values of each element represent the upper bound of the success probability of CNOT entangling operation between a pair of qubits.<d-footnote> This is expressed as a sequence of CNOT gates acting across the qubits that connect the pair of qubits which gives the highest success probability.</d-footnote><d-footnote> In an actual experiment, qubit decoherence resulted in lowered fidelity of the prepared state.</d-footnote> Ideally, the value should be unity. Therefore, a good central qubit should be the one with the highest success probability.
 
 ```python
 avg_success = np.mean(np.exp(-distance_matrix), axis=1)
@@ -195,34 +195,40 @@ The implementation of the transversal algorithm consists of two parts: the _sear
 - `bfs_search` / `BFSVisitor`
 - `dijkstra_search` / `DijkstraVisitor`
 
-The transversal algorithm of interest for the weighted graph is the Dijkstra's algorithm. The Dijkstra's algorithm is a single-source shortest path algorithm that is applicable to both weighted and unweighted graphs. The pseudo-code for the `dijkstra_search` algorithm is as follows, which consists of several event points.
+The transversal algorithm of interest for the weighted graph is the Dijkstra's algorithm. The Dijkstra's algorithm is a single-source shortest path algorithm that is applicable to both weighted and unweighted graphs. The pseudo-code for the `dijkstra_search` algorithm is as follows, which consists of several event points. The visitor object implements the callback functions that are invoked at [each event point as defined by the pseudo-code](https://qiskit.org/documentation/retworkx/apiref/rustworkx.dijkstra_search.html#rustworkx.dijkstra_search). In particular, the event of interest is the `edge_relaxed` which is triggered when a shorter path is discovered. With that in mind, a visitor object that records the edges of a shortest path tree with root from the central qubit can be implemented as follows:
 
+ ```python
+ class TreeEdgesRecorder(rx.visit.DijkstraVisitor):
+
+    def __init__(self):
+        self.edges = []
+
+    def edge_relaxed(self, edge):
+        self.edges.append(edge)
+
+vis = TreeEdgesRecorder()
+rx.dijkstra_search(g, [np.argmin(avg_success)], float, vis)
+
+colormap = matplotlib.colormaps["magma"]
+norm = matplotlib.colors.Normalize(
+    vmin=min(avg_success),
+    vmax=max(avg_success)*1.05
+)
+
+t = rx.PyDiGraph()
+t.extend_from_weighted_edge_list(vis.edges)
+for node_id, btw in enumerate(avg_success):
+    t[node_id] = (node_id, btw)
+
+graphviz_draw(t, method='dot', node_attr_fn=color_node, graph_attr={'rankdir': 'LR'})
 ```
-DIJKSTRA(G, source, weight)
-  for each vertex u in V
-      d[u] := infinity
-      p[u] := u
-  end for
-  d[source] := 0
-  INSERT(Q, source)
-  while (Q != Ø)
-      u := EXTRACT-MIN(Q)                         discover vertex u
-      for each vertex v in Adj[u]                 examine edge (u,v)
-          if (weight[(u,v)] + d[u] < d[v])        edge (u,v) relaxed
-              d[v] := weight[(u,v)] + d[u]
-              p[v] := u
-              DECREASE-KEY(Q, v)
-          else                                    edge (u,v) not relaxed
-              ...
-          if (d[v] was originally infinity)
-              INSERT(Q, v)
-      end for                                     finish vertex u
-  end while
-```
 
- The visitor object implements the callback functions that are invoked at each event point. In particular, 
+<img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/dijkstra.png"><br>
 
-## Map Coloring, Efficient Measurement and Chemical Structure
+The tree obtained from the central root node provides a heuristic approach to hardware-aware mapping of quantum circuits for a whole device entanglement or state preparation (for instance, quantum circuit decomposition of a center-gauge matrix product state).<d-cite key=dborin2021matrix></d-cite> This technique attempt to minimize the distance between the furthest qubits and the CNOT gate error rate. This concludes the brief demonstration of rustworkx graph library and its application to quantum computing.
+
+
+## Map Coloring and Efficient Quantum Measurement
 
 What do map coloring, efficient measurement and chemical structure have in common? It turns out that efficiently evaluating a chemical structure's electronic wavefunction and energy can be traced back to the problem of map coloring. This section will explore the connection between these three topics and how rustworkx was used within the Qiskit codebase.
 
@@ -262,7 +268,5 @@ graphviz_draw(graph, node_attr_fn=node_attr, graph_attr={'rankdir': 'LR'})
 <img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/pauli-grouping.png"><br>
 
 This is the exact implementation of `PauliList.group_commuting` under Qiskit.
-
-### Variational Quantum Eigensolver
 
 ## Final Remarks
