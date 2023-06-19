@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://soon-teh.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://soon-teh.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-19T12:44:18+00:00</updated><id>https://soon-teh.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"><generator uri="https://jekyllrb.com/" version="4.3.2">Jekyll</generator><link href="https://soon-teh.github.io/feed.xml" rel="self" type="application/atom+xml" /><link href="https://soon-teh.github.io/" rel="alternate" type="text/html" hreflang="en" /><updated>2023-06-19T15:28:18+00:00</updated><id>https://soon-teh.github.io/feed.xml</id><title type="html">blank</title><subtitle>A simple, whitespace theme for academics. Based on [*folio](https://github.com/bogoli/-folio) design.
 </subtitle><entry><title type="html">Introduction to rustworkx</title><link href="https://soon-teh.github.io/blog/2023/intro-to-rustworkx/" rel="alternate" type="text/html" title="Introduction to rustworkx" /><published>2023-06-07T00:00:00+00:00</published><updated>2023-06-07T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2023/intro-to-rustworkx</id><content type="html" xml:base="https://soon-teh.github.io/blog/2023/intro-to-rustworkx/"><![CDATA[<h2 id="rustworkx">rustworkx</h2>
 <p>Qiskit uses <a href="https://github.com/Qiskit/rustworkx"><strong>rustworkx</strong></a> (or formerly <strong>retworkx</strong>), a graph library under the hood. rustworkx was originally conceived to build a faster directed acyclic graph (DAG) to use as the underlying data structure for qiskit-terra’s transpiler. For instance, a Bell state circuit can be represented as a directed graph as follows:</p>
 
@@ -178,22 +178,31 @@
 <p>The tree obtained from the central root node provides a heuristic approach to hardware-aware mapping of quantum circuits for a whole device entanglement or state preparation (for instance, quantum circuit decomposition of a center-gauge matrix product state).<d-cite key="dborin2021matrix"></d-cite> This technique attempt to minimize the distance between the furthest qubits and the CNOT gate error rate. This concludes the brief demonstration of rustworkx graph library and its application to quantum computing.</p>
 
 <h2 id="map-coloring-and-efficient-quantum-measurement">Map Coloring and Efficient Quantum Measurement</h2>
+<p>How can methods for coloring a map lead to a speedup in quant?um algorithm such as variational quantum eigensolver (VQE)? This section will explore the connection between these topics and how rustworkx was used within the Qiskit codebase.</p>
 
-<p>What do map coloring, efficient measurement and chemical structure have in common? It turns out that efficiently evaluating a chemical structure’s electronic wavefunction and energy can be traced back to the problem of map coloring. This section will explore the connection between these three topics and how rustworkx was used within the Qiskit codebase.</p>
+<h3 id="four-color-theorem">Four-Color Theorem</h3>
 
-<h3 id="4-color-theorem">4 Color Theorem</h3>
+<p>In the October of 1852, Francis Guthrie who was a student in London noticed that only four colors are needed to color the map of the counties of England in such a way that no two countries sharing a common border receive the same color. This then started a chain of letters which sees the birth of the four-color conjecture.</p>
+
+<p>Early proofs of the theorem by Alfred Kempe in 1879 and Peter Guthrie Tait in 1880 turn out to be fallacious after eleven years. Eventually, the first correct proof was published in 1976 by Kenneth Appel and Wolfgang Haken. The proof was controversial as it was the first major theorem to be proved using a computer. The proof was not accepted by the mathematical community until 1997 when it was verified by other mathematicians.</p>
+
+<p>Each region or country on a map can be represented by a node. Two nodes are connected by an edge if the corresponding regions share a common border. Thus, the map coloring is reduced to a planar graph coloring problem. Planar graph is a graph that can be embedded in a plane without any edges crossing. For general graph coloring problem, more colors are needed.</p>
 
 <p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/apac.png" /><br /></p>
 
+<p>Enjoy a colored map of the Asia-Pacific!</p>
+
 <h3 id="pauli-grouping">Pauli Grouping</h3>
-<p>Commuting variables can be measured simultaneously. The grouping of commuting Pauli strings is useful for measurement reduction.</p>
+<p>VQE is a hybrid quantum-classical algorithm designed to find the ground state or energy spectrum of a physical or chemical system. However, obtaining the expectation value of a Hamiltonian requires decomposition into a weighted sum of Pauli string. Each Pauli string needs to be sampled sufficiently many times to obtain a good estimate of the expectation value. Thus, the ability to simultaneously measure commuting Pauli strings, i.e. Pauli grouping is crucial to the performance of VQE.</p>
+
+<p>Starting from a set of Pauli strings <code class="language-plaintext highlighter-rouge">["XX", "YY", "IZ", "ZZ", "ZX"]</code>, the goal is to group the Pauli strings into commuting sets. The algorithm first constructs a graph where the presence of an edge between two nodes indicates their non-commutativity. The graph is then colored such that no two adjacent nodes have the same color. The coloring of the graph then determines the grouping of the Pauli strings.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="kn">from</span> <span class="n">qiskit.quantum_info</span> <span class="kn">import</span> <span class="n">PauliList</span>
 
 <span class="n">op</span> <span class="o">=</span> <span class="nc">PauliList</span><span class="p">([</span><span class="sh">"</span><span class="s">XX</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">YY</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">IZ</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">ZZ</span><span class="sh">"</span><span class="p">,</span> <span class="sh">"</span><span class="s">ZX</span><span class="sh">"</span><span class="p">])</span>
 </code></pre></div></div>
 
-<p>Coloring a planar graph is still a NP-hard problem, but a heuristic algorithm can be employed to obtain a good coloring. The greedy algorithm is one such algorithm that is simple and fast. The algorithm starts with an empty coloring and iteratively colors the nodes with the lowest possible color. The algorithm is guaranteed to produce a coloring that is at most one more than the optimal coloring. The algorithm is implemented in rustworkx and can be accessed via <code class="language-plaintext highlighter-rouge">graph_greedy_color</code>.</p>
+<p>Coloring a graph is still an NP-hard problem, but a heuristic algorithm can be employed to obtain good coloring. The greedy algorithm is one such algorithm that is simple and fast. The algorithm starts with an empty coloring and iteratively colors the nodes with the lowest possible color. The algorithm is guaranteed to produce a coloring that is at most one more than the optimal coloring. The algorithm is implemented in rustworkx and can be accessed via <code class="language-plaintext highlighter-rouge">graph_greedy_color</code>.</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code><span class="n">cmap</span> <span class="o">=</span> <span class="n">matplotlib</span><span class="p">.</span><span class="n">cm</span><span class="p">.</span><span class="nf">get_cmap</span><span class="p">(</span><span class="sh">'</span><span class="s">tab10</span><span class="sh">'</span><span class="p">)</span>
 
@@ -213,7 +222,7 @@
 
 <p><img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/pauli-grouping.png" /><br /></p>
 
-<p>This is the exact implementation of <code class="language-plaintext highlighter-rouge">PauliList.group_commuting</code> under Qiskit.</p>
+<p>This is the exact implementation of <code class="language-plaintext highlighter-rouge">PauliList.group_commuting</code> under Qiskit. Now, instead of 5 measurements, only 3 measurements are needed to sample all the Pauli strings once. This is a 40% reduction in the number of measurements, demonstrating the importance of Pauli grouping in VQE.</p>
 
 <h2 id="final-remarks">Final Remarks</h2>]]></content><author><name>Soon Teh</name></author><category term="qiskit" /><category term="rustworkx" /><summary type="html"><![CDATA[With examples and applications in quantum computing]]></summary></entry><entry><title type="html">Generating GHZ state on IBM device</title><link href="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/" rel="alternate" type="text/html" title="Generating GHZ state on IBM device" /><published>2023-05-30T00:00:00+00:00</published><updated>2023-05-30T00:00:00+00:00</updated><id>https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz</id><content type="html" xml:base="https://soon-teh.github.io/blog/2023/quantum-challenge-spring-ghz/"><![CDATA[<h2 id="ibm-quantum-spring-challenge-2023">IBM Quantum Spring Challenge 2023</h2>
 <p><a href="https://research.ibm.com/blog/quantum-challenge-spring-2023">IBM Quantum Spring Challenge</a> was a public event held from May 17 to May 24. This challenge is part of IBM Quantum’s ongoing global education efforts and is free to participate in. The challenge’s goal is to provide participants with a deeper understanding of a specific quantum topic.</p>
