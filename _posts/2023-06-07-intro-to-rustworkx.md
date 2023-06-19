@@ -278,3 +278,4 @@ graphviz_draw(graph, node_attr_fn=node_attr, graph_attr={'rankdir': 'LR'})
 This is the exact implementation of `PauliList.group_commuting` under Qiskit. Now, instead of 5 measurements, only 3 measurements are needed to sample all the Pauli strings once. This is a 40% reduction in the number of measurements, demonstrating the importance of Pauli grouping in VQE.
 
 ## Final Remarks
+Graph theory is a powerful tool that can be applied to many problems in quantum computing and beyond. For performance-critical applications, rustworkx provides a fast and efficient implementation of graph data structure and algorithms. The library is still in its early stage of development and more features will be added in the future. For those interested in contributing or finding out more about the project, please check out the [GitHub repository](https://github.com/Qiskit/rustworkx).
