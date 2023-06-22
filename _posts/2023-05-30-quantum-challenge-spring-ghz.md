@@ -118,7 +118,7 @@ $$
 &\ +|011\rangle_{\text{ent}}|10\rangle_{\text{parity}}+|100\rangle_{\text{ent}}|10\rangle_{\text{parity}}+|101\rangle_{\text{ent}}|11\rangle_{\text{parity}} \\
 &\ +|110\rangle_{\text{ent}}|01\rangle_{\text{parity}}+|111\rangle_{\text{ent}}|00\rangle_{\text{parity}} \\
 
-\xrightarrow{\text{Parity X gate}}|&\, 00000\rangle+|10101\rangle
+\xrightarrow{\text{Parity X gate}} &\, |00000\rangle+|10101\rangle
 \end{align*}
 $$
 
