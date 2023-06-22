@@ -108,17 +108,17 @@ where the parity X gates are drawn explicitly using a soon-to-be deprecated `c_i
 
 $$
 \begin{align*}
-|00000\rangle &\, \xrightarrow{\text{Hadamard}} &\, |00000\rangle+|00001\rangle+|00100\rangle+|01101\rangle \\
+|00000\rangle  \xrightarrow{\text{Hadamard}} &\, |00000\rangle+|00001\rangle+|00100\rangle+|01101\rangle \\
 &\ +|10000\rangle+|10001\rangle+|10100\rangle+|10101\rangle \\
 
-& \xrightarrow{\text{CNOT}} &\, |00000\rangle+|00011\rangle+|01110\rangle+|01101\rangle \\
+\xrightarrow{\text{CNOT}} &\, |00000\rangle+|00011\rangle+|01110\rangle+|01101\rangle \\
 &\ +|11000\rangle+|11011\rangle+|10110\rangle+|10101\rangle \\
 
-& = &\, |000\rangle_{\text{ent}}|00\rangle_{\text{parity}}+|001\rangle_{\text{ent}}|01\rangle_{\text{parity}}+|010\rangle_{\text{ent}}|11\rangle_{\text{parity}}\\
+= &\, |000\rangle_{\text{ent}}|00\rangle_{\text{parity}}+|001\rangle_{\text{ent}}|01\rangle_{\text{parity}}+|010\rangle_{\text{ent}}|11\rangle_{\text{parity}}\\
 &\ +|011\rangle_{\text{ent}}|10\rangle_{\text{parity}}+|100\rangle_{\text{ent}}|10\rangle_{\text{parity}}+|101\rangle_{\text{ent}}|11\rangle_{\text{parity}} \\
 &\ +|110\rangle_{\text{ent}}|01\rangle_{\text{parity}}+|111\rangle_{\text{ent}}|00\rangle_{\text{parity}} \\
 
-& \xrightarrow{\text{Parity X gate}}|&\, 00000\rangle+|10101\rangle
+\xrightarrow{\text{Parity X gate}}|&\, 00000\rangle+|10101\rangle
 \end{align*}
 $$
 
