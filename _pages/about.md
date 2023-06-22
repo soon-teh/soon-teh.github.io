@@ -14,9 +14,9 @@ subtitle: PhD student at <a href='https://groups.oist.jp/equip'>Experiemental Qu
 #     <p>1919-1 Tancha, Onna son</p>
 #     <p>OIST Village Center 451</p>
 
-news: true  # includes a list of news items
+news: false  # includes a list of news items
 latest_posts: true  # includes a list of the newest posts
-selected_papers: true # includes a list of papers marked as "selected={true}"
+selected_papers: false # includes a list of papers marked as "selected={true}"
 social: true  # includes social icons at the bottom of the page
 ---
 
