@@ -174,7 +174,7 @@
               <li><a href="#visualization">Visualization</a></li>
               <li><a href="#betweenness-centrality">Betweenness Centrality</a></li>
               <li><a href="#distance-matrix">Distance Matrix</a></li>
-              <li><a href="#transversal">Transversal</a></li>
+              <li><a href="#traversal">Traversal</a></li>
               
             </ul>
 <div><a href="#map-coloring-and-efficient-quantum-measurement">Map Coloring and Efficient Quantum Measurement</a></div>
@@ -327,8 +327,8 @@
 
 <p>When taking into account the edge weight, the poor CNOT performance of node 15 manifests and its surrounding nodes exhibit poor average success probability. Thus, node 14 is now a better candidate for a central qubit.</p>
 
-<h3 id="transversal">Transversal</h3>
-<p>The implementation of the transversal algorithm consists of two parts: the <em>search algorithm</em> and the <em>visitor object</em>. As of rustworkx 0.13, three search algorithm with their corresponding visitor object exists:</p>
+<h3 id="traversal">Traversal</h3>
+<p>The implementation of the traversal algorithm consists of two parts: the <em>search algorithm</em> and the <em>visitor object</em>. As of rustworkx 0.13, three search algorithm with their corresponding visitor object exists:</p>
 <ul>
   <li>
 <code class="language-plaintext highlighter-rouge">dfs_search</code> / <code class="language-plaintext highlighter-rouge">DFSVisitor</code>
@@ -341,7 +341,7 @@
 </li>
 </ul>
 
-<p>The transversal algorithm of interest for the weighted graph is Dijkstra’s algorithm. The Dijkstra’s algorithm is a single-source shortest-path algorithm that is applicable to both weighted and unweighted graphs. The pseudo-code for the <code class="language-plaintext highlighter-rouge">dijkstra_search</code> algorithm is as follows, which consists of several event points. The visitor object implements the callback functions that are invoked at <a href="https://qiskit.org/documentation/retworkx/apiref/rustworkx.dijkstra_search.html#rustworkx.dijkstra_search" rel="external nofollow noopener" target="_blank">each event point as defined by the pseudo-code</a>. In particular, the event of interest is the <code class="language-plaintext highlighter-rouge">edge_relaxed</code> which is triggered when a shorter path is discovered. With that in mind, a visitor object that records the edges of the shortest path tree with root from the central qubit can be implemented as follows:</p>
+<p>The traversal algorithm of interest for the weighted graph is Dijkstra’s algorithm. The Dijkstra’s algorithm is a single-source shortest-path algorithm that is applicable to both weighted and unweighted graphs. The pseudo-code for the <code class="language-plaintext highlighter-rouge">dijkstra_search</code> algorithm is as follows, which consists of several event points. The visitor object implements the callback functions that are invoked at <a href="https://qiskit.org/documentation/retworkx/apiref/rustworkx.dijkstra_search.html#rustworkx.dijkstra_search" rel="external nofollow noopener" target="_blank">each event point as defined by the pseudo-code</a>. In particular, the event of interest is the <code class="language-plaintext highlighter-rouge">edge_relaxed</code> which is triggered when a shorter path is discovered. With that in mind, a visitor object that records the edges of the shortest path tree with root from the central qubit can be implemented as follows:</p>
 
 <div class="language-python highlighter-rouge"><div class="highlight"><pre class="highlight"><code> <span class="k">class</span> <span class="nc">TreeEdgesRecorder</span><span class="p">(</span><span class="n">rx</span><span class="p">.</span><span class="n">visit</span><span class="p">.</span><span class="n">DijkstraVisitor</span><span class="p">):</span>
 
