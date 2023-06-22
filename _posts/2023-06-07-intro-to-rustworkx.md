@@ -22,7 +22,7 @@ toc:
     - name: Visualization
     - name: Betweenness Centrality
     - name: Distance Matrix
-    - name: Transversal
+    - name: Traversal
   - name: Map Coloring and Efficient Quantum Measurement
     subsections:
     - name: Four-Color Theorem
@@ -188,13 +188,13 @@ plt.ylabel('Average Success CNOT Entangling Probability')
 When taking into account the edge weight, the poor CNOT performance of node 15 manifests and its surrounding nodes exhibit poor average success probability. Thus, node 14 is now a better candidate for a central qubit.
 
 
-### Transversal
-The implementation of the transversal algorithm consists of two parts: the _search algorithm_ and the _visitor object_. As of rustworkx 0.13, three search algorithm with their corresponding visitor object exists: 
+### Traversal
+The implementation of the traversal algorithm consists of two parts: the _search algorithm_ and the _visitor object_. As of rustworkx 0.13, three search algorithm with their corresponding visitor object exists: 
 - `dfs_search` / `DFSVisitor` 
 - `bfs_search` / `BFSVisitor`
 - `dijkstra_search` / `DijkstraVisitor`
 
-The transversal algorithm of interest for the weighted graph is Dijkstra's algorithm. The Dijkstra's algorithm is a single-source shortest-path algorithm that is applicable to both weighted and unweighted graphs. The pseudo-code for the `dijkstra_search` algorithm is as follows, which consists of several event points. The visitor object implements the callback functions that are invoked at [each event point as defined by the pseudo-code](https://qiskit.org/documentation/retworkx/apiref/rustworkx.dijkstra_search.html#rustworkx.dijkstra_search). In particular, the event of interest is the `edge_relaxed` which is triggered when a shorter path is discovered. With that in mind, a visitor object that records the edges of the shortest path tree with root from the central qubit can be implemented as follows:
+The traversal algorithm of interest for the weighted graph is Dijkstra's algorithm. The Dijkstra's algorithm is a single-source shortest-path algorithm that is applicable to both weighted and unweighted graphs. The pseudo-code for the `dijkstra_search` algorithm is as follows, which consists of several event points. The visitor object implements the callback functions that are invoked at [each event point as defined by the pseudo-code](https://qiskit.org/documentation/retworkx/apiref/rustworkx.dijkstra_search.html#rustworkx.dijkstra_search). In particular, the event of interest is the `edge_relaxed` which is triggered when a shorter path is discovered. With that in mind, a visitor object that records the edges of the shortest path tree with root from the central qubit can be implemented as follows:
 
  ```python
  class TreeEdgesRecorder(rx.visit.DijkstraVisitor):
