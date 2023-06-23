@@ -90,7 +90,7 @@ With limited connectivity, the circuit depth then scales with $log_b(N)$, where 
 
 <img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-05-30/bfs-cnot.gif">
 
-For `ibm_sherbrooke` device, $q_{62}$ (node in red) was identified as one of the central nodes, and the BFS tree from this central node spans the red edges. The CNOT gates are then applied in the reversed order of depth as shown in the animation to ensure that the gate depth is bounded by the furthest node from the central node. Disentangling the stabilizer is trivial, which requires transversing the tree in reversed direction and applying a CNOT with the odd-numbered qubit as the target. However, the BFS approach is still far from optimal even when all-to-all connectivity is available.
+For `ibm_sherbrooke` device, $q_{62}$ (node in red) was identified as one of the central nodes, and the BFS tree from this central node spans the red edges. The CNOT gates are then applied in the reversed order of depth as shown in the animation to ensure that the gate depth is bounded by the furthest node from the central node. Disentangling the stabilizer is trivial, which requires traversing the tree in reversed direction and applying a CNOT with the odd-numbered qubit as the target. However, the BFS approach is still far from optimal even when all-to-all connectivity is available.
 
 
 ### Dynamic Circuit
