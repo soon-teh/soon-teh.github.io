@@ -108,7 +108,7 @@ where the parity X gates are drawn explicitly using a soon-to-be deprecated `c_i
 
 $$
 \begin{align*}
-|00000\rangle  \xrightarrow{\text{Hadamard}} &\, |00000\rangle+|00001\rangle+|00100\rangle+|01101\rangle \\
+|00000\rangle  \xrightarrow{\text{Hadamard}} &\, |00000\rangle+|00001\rangle+|00100\rangle+|00101\rangle \\
 &\ +|10000\rangle+|10001\rangle+|10100\rangle+|10101\rangle \\
 
 \xrightarrow{\text{CNOT}} &\, |00000\rangle+|00011\rangle+|01110\rangle+|01101\rangle \\
