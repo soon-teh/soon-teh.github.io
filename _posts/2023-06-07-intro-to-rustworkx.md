@@ -173,7 +173,7 @@ plt.colorbar()
 
 <img class="mx-auto d-block mb-2 post-img" src="/assets/img/2023-06-07/distance.png"><br>
 
-Physically, the values of each element represent the upper bound of the success probability of CNOT entangling operation between a pair of qubits.<d-footnote> This is expressed as a sequence of CNOT gates acting across the qubits that connect the pair of qubits which gives the highest success probability.</d-footnote><d-footnote> In an actual experiment, qubit decoherence resulted in lowered fidelity of the prepared state.</d-footnote> Ideally, the value should be unity. Therefore, a good central qubit should be the one with the highest success probability.
+Physically, the values of each element represent the upper bound of the success probability of CNOT entangling operation between a pair of qubits.<d-footnote> In an actual experiment, qubit decoherence resulted in lowered fidelity of the prepared state.</d-footnote><d-footnote> The entangling operation is a sequence of CNOT gates acting across the qubits that connect the pair of qubits which gives the highest success probability.</d-footnote> Ideally, the value should be unity. Therefore, a good central qubit should be the one with the highest success probability.
 
 ```python
 avg_success = np.mean(np.exp(-distance_matrix), axis=1)
@@ -194,7 +194,7 @@ The implementation of the traversal algorithm consists of two parts: the _search
 - `bfs_search` / `BFSVisitor`
 - `dijkstra_search` / `DijkstraVisitor`
 
-The traversal algorithm of interest for the weighted graph is Dijkstra's algorithm. The Dijkstra's algorithm is a single-source shortest-path algorithm that is applicable to both weighted and unweighted graphs. The pseudo-code for the `dijkstra_search` algorithm is as follows, which consists of several event points. The visitor object implements the callback functions that are invoked at [each event point as defined by the pseudo-code](https://qiskit.org/documentation/retworkx/apiref/rustworkx.dijkstra_search.html#rustworkx.dijkstra_search). In particular, the event of interest is the `edge_relaxed` which is triggered when a shorter path is discovered. With that in mind, a visitor object that records the edges of the shortest path tree with root from the central qubit can be implemented as follows:
+The traversal algorithm of interest for the weighted graph is Dijkstra's algorithm. The Dijkstra's algorithm is a single-source shortest-path algorithm that is applicable to both weighted and unweighted graphs. The visitor object implements the callback functions that are invoked at [each event point as defined by the pseudo-code](https://qiskit.org/documentation/retworkx/apiref/rustworkx.dijkstra_search.html#rustworkx.dijkstra_search). In particular, the event of interest is the `edge_relaxed` which is triggered when a shorter path is discovered. With that in mind, a visitor object that records the edges of the shortest path tree with root from the central qubit can be implemented as follows:
 
  ```python
  class TreeEdgesRecorder(rx.visit.DijkstraVisitor):
